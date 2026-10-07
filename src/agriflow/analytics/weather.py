@@ -1,6 +1,7 @@
 from __future__ import annotations
 import numpy as np
 import pandas as pd
+from datetime import timedelta
 
 from agriflow.data.identity import ensure_market_id
 
@@ -111,8 +112,16 @@ def event_study(
         b = before.iloc[0]
         base_date = before.index[-1]
         for h in horizons:
-            target = pd.Timestamp(e.date) + pd.Timedelta(days=h)
-            future = g[(g.index >= target) & (g.index <= target + pd.Timedelta(days=observation_tolerance_days))].head(1)
+            target = pd.Timestamp(e.date) + timedelta(days=int(h))
+            tolerance_days = int(observation_tolerance_days)
+            future = g[
+                (g.index >= target)
+                & (
+                    g.index
+                    <= target + timedelta(days=tolerance_days)
+                )
+            ].head(1)
+          
             if future.empty:
                 continue
             f = future.iloc[0]

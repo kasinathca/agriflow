@@ -4,6 +4,20 @@ Release date: 2026-10-07
 
 This release hardens the transition from verified software to academically defensible real-data analysis. The central objective is to ensure that authentic-looking but secondary, user-supplied or mirrored data can never silently become final-paper evidence.
 
+# AgriFlow v1.4.1 — CI Compatibility Fix
+
+Release date: 2026-10-07
+
+## Fixed
+- Fixed Python 3.10 and Python 3.11 parsing failure in the POWER weather planning CLI output.
+- Refactored POWER cell-count reporting for cross-version compatibility.
+- GitHub Actions now installs the declared development dependency set through `.[dev]`.
+- CI now explicitly performs Python compilation and structural validation before running tests.
+- Disabled matrix fail-fast so Python 3.10, 3.11 and 3.12 are independently validated.
+
+## Scope
+This is a maintenance release. No analytical methodology, dataset provenance policy, or empirical interpretation has changed.
+
 ## Added / changed
 - record-level `source_tier` classification with conservative inference;
 - paper-acceptable tiers restricted to `PRIMARY_OFFICIAL` and `CURATED_OFFICIAL_DERIVED`;

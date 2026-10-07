@@ -351,7 +351,16 @@ def cmd_weather(args):
     ing=PowerHistoricalIngestor(NasaPowerSource(),settings.raw_dir,settings.processed_dir)
     jobs=ing.plan(usable,args.start,args.end)
     mapping=pd.read_csv(settings.processed_dir/"power_market_cells.csv")
-    print(f"POWER plan: {len(jobs):,} resumable cell × year jobs for {len(mapping):,} markets across {mapping[["power_cell_lat","power_cell_lon"]].drop_duplicates().shape[0]:,} meteorological cells")
+    cell_count = (
+    mapping[["power_cell_lat", "power_cell_lon"]]
+    .drop_duplicates()
+    .shape[0]
+    )
+
+    print(
+        f"POWER plan: {len(jobs):,} resumable cell × year jobs "
+        f"for {len(mapping):,} markets across {cell_count:,} meteorological cells"
+    ) 
     if args.dry_run:
         for job in jobs[:25]:
             print(f"  {job.cell_lat:.3f},{job.cell_lon:.3f} | {job.start_date}..{job.end_date}")
