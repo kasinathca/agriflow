@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+title: "AgriFlow: Spatiotemporal Analysis of Price Transmission, Weather Shocks, and Market Integration Across Indian Agricultural Mandis"
+message: "If you use or discuss this academic project, please cite the project and the underlying public data sources separately."
+type: software
+authors:
+  - family-names: "C A"
+    given-names: "Kasinath"
+  - family-names: "C S"
+    given-names: "Kamal Nayan"
+version: 1.4.0
+date-released: 2026-10-07
+license: MIT
