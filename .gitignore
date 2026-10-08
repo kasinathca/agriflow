@@ -17,6 +17,6 @@ data/cache/*
 !data/cache/.gitkeep
 .DS_Store
 Thumbs.db
-
+*.egg-info/
 data/demo/*.csv
 !data/demo/.gitkeep

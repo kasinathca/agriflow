@@ -121,7 +121,6 @@ def event_study(
                     <= target + timedelta(days=tolerance_days)
                 )
             ].head(1)
-          
             if future.empty:
                 continue
             f = future.iloc[0]

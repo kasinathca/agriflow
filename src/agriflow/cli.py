@@ -360,7 +360,7 @@ def cmd_weather(args):
     print(
         f"POWER plan: {len(jobs):,} resumable cell × year jobs "
         f"for {len(mapping):,} markets across {cell_count:,} meteorological cells"
-    ) 
+    )
     if args.dry_run:
         for job in jobs[:25]:
             print(f"  {job.cell_lat:.3f},{job.cell_lon:.3f} | {job.start_date}..{job.end_date}")
