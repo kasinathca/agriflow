@@ -7,6 +7,7 @@ from dash import Dash, Input, Output, State, dcc, html, dash_table, no_update
 
 from agriflow.config import settings
 from agriflow.data.repository import DataRepository
+from agriflow.data.names import canonical_state
 from agriflow.data.processing import quality_summary
 from agriflow.analytics.coverage import coverage_audit
 from agriflow.analytics.selection import commodity_scope_table, SelectionPolicy
@@ -17,6 +18,7 @@ from agriflow.analytics.integration import market_integration_pairs
 from agriflow.analytics.weather import join_market_weather, event_study, event_study_summary
 from agriflow.analytics.events import detect_market_crunches, detect_price_shocks
 from agriflow.analytics.supply_price import supply_price_stats
+from agriflow.research.freeze import ReadinessPolicy, empirical_readiness
 from agriflow.visualization.figures import (
     price_trend, arrivals_price_scatter, coverage_heatmap, state_map, network_figure,
     influence_bar, distance_scatter, weather_price_figure, weather_event_response_figure, crunch_table_figure, ripple_figure,
@@ -52,6 +54,23 @@ def _filter(commodity: str, state: str, start_date, end_date) -> pd.DataFrame:
     if start_date: x = x[x.date >= pd.Timestamp(start_date)]
     if end_date: x = x[x.date <= pd.Timestamp(end_date)]
     return x
+
+
+def _national_map_frame(commodity: str, start_date, end_date) -> pd.DataFrame:
+    """Keep the India map national while other panels follow the state selector."""
+    return _filter(commodity, "All India", start_date, end_date)
+
+
+def _map_click_state(click, available_states=None):
+    if not click or not click.get("points"):
+        return None
+    point = click["points"][0]
+    value = point.get("location") or point.get("hovertext") or point.get("text")
+    if not value:
+        return None
+    states = PRICES.state.dropna().astype(str) if available_states is None else available_states
+    canonical_lookup = {canonical_state(state): state for state in states}
+    return canonical_lookup.get(canonical_state(value))
 
 
 def create_app() -> Dash:
@@ -126,9 +145,10 @@ def create_app() -> Dash:
                 html.Div(className="grid-2", children=[html.Div(dcc.Graph(figure=coverage_heatmap(AUDIT,commodity)),className="card"),html.Div([html.H3("Supply–price association"),html.P(assoc),html.P("The elasticity estimate is associative and does not identify a causal supply curve.",className="section-note")],className="card")])
             ])
         if tab == "map":
+            map_frame=_national_map_frame(commodity,start,end)
             return html.Div([
-                html.Div("Click a state polygon when the official GeoJSON cache is available. The global state selector and linked views will update.", className="section-note"),
-                html.Div(dcc.Graph(id="india-map", figure=state_map(x,MARKETS,commodity,GEOJSON), style={"height":"650px"}, config={"toImageButtonOptions":{"format":"svg","filename":f"agriflow_{commodity.lower()}_india_state_map"}}), className="card"),
+                html.Div("Click a state polygon to update the global state selector and linked views. The main choropleth intentionally retains its national frame.", className="section-note"),
+                html.Div(dcc.Graph(id="india-map", figure=state_map(map_frame,MARKETS,commodity,GEOJSON), style={"height":"650px"}, config={"toImageButtonOptions":{"format":"svg","filename":f"agriflow_{commodity.lower()}_india_state_map"}}), className="card"),
                 html.Div(className="grid-2", children=[html.Div(dcc.Graph(figure=price_trend(x,commodity,state)),className="card"),html.Div(dcc.Graph(figure=coverage_heatmap(AUDIT,commodity)),className="card")])
             ])
         if tab == "influence":
@@ -169,10 +189,28 @@ def create_app() -> Dash:
             table = dash_table.DataTable(data=integ.head(15).round(3).to_dict("records"),columns=[{"name":c.replace("_"," ").title(),"id":c} for c in integ.columns],page_size=10,style_table={"overflowX":"auto"},style_header={"fontWeight":"700","backgroundColor":"#E9EEE9"}) if not integ.empty else html.P("Insufficient data for pairwise integration scores.")
             return html.Div([html.Div("Distance is great-circle distance, not road distance or transport cost. Because market-pair observations are not independent, the dashboard reports a QAP-style label-permutation significance check for distance decay. The integration score remains an exploratory composite and must be read with its component metrics.",className="academic-note"),html.Div(dcc.Graph(figure=distance_scatter(pairs)),className="card"),html.Div(className="grid-2",children=[html.Div([html.H3("Distance-effect statistic"),html.P(text)],className="card"),html.Div([html.H3("Most integrated market pairs"),table],className="card")])])
         if tab == "research":
+            current=empirical_readiness(
+                PRICES,MARKETS,WEATHER,[commodity],start,end,ReadinessPolicy()
+            )
+            current_gates=pd.DataFrame(current.get("gates",[]))
+            current_table=dash_table.DataTable(
+                data=current_gates.to_dict("records"),
+                columns=[{"name":c.replace("_"," ").title(),"id":c} for c in current_gates.columns],
+                page_size=12,style_table={"overflowX":"auto"},
+                style_header={"fontWeight":"700","backgroundColor":"#E9EEE9"},
+            ) if not current_gates.empty else html.P("No current readiness details are available.")
+            current_view=html.Div([
+                html.Div(
+                    f"Current {MODE} dataset readiness: {current['status']}. REAL data is not automatically paper-ready; review every warning before making empirical claims.",
+                    className="academic-note",
+                ),
+                html.Div([html.H3("Current dataset readiness gates"),current_table],className="card"),
+            ])
             freeze_root=settings.output_dir/"freezes"
             dirs=sorted([p for p in freeze_root.glob("*") if p.is_dir()],reverse=True) if freeze_root.exists() else []
             if not dirs:
                 return html.Div([
+                    current_view,
                     html.Div("No empirical scope has been frozen yet. Exploratory dashboard views remain useful, but final-paper claims should be generated only from a verified freeze.",className="academic-note"),
                     html.Div([html.H3("Required empirical gate"),html.P("Run readiness-audit, review all WARN/FAIL gates, then use freeze-scope. The freeze records exact commodity/date scope, data provenance, coordinate/weather coverage and SHA-256 hashes.")],className="card")
                 ])
@@ -184,13 +222,14 @@ def create_app() -> Dash:
                 gate_table=dash_table.DataTable(data=gates.to_dict("records"),columns=[{"name":c.replace("_"," ").title(),"id":c} for c in gates.columns],page_size=12,style_table={"overflowX":"auto"},style_header={"fontWeight":"700","backgroundColor":"#E9EEE9"}) if not gates.empty else html.P("No gate details available.")
                 scope=manifest.get("scope",{})
                 return html.Div([
+                    current_view,
                     html.Div(f"Latest frozen scope: {latest.name}. Status: {manifest.get('readiness_status','unknown')}. Frozen inputs are checksum-protected; rerun verify-freeze before using results in the paper.",className="academic-note"),
                     html.Div(className="grid-3",children=[_card("Frozen commodities",str(len(scope.get("commodities",[])))),_card("Start",scope.get("start_date","—")),_card("End",scope.get("end_date","—"))]),
                     html.Div([html.H3("Readiness gates"),gate_table],className="card"),
                     html.Div([html.H3("Academic integrity"),html.P(manifest.get("academic_integrity","")),html.P("A frozen run is reproducible evidence; it is not itself proof of causality. Network/weather interpretation guardrails still apply.",className="section-note")],className="card")
                 ])
             except Exception as exc:
-                return html.Div(f"Latest freeze metadata could not be read: {exc}",className="academic-note")
+                return html.Div([current_view,html.Div(f"Latest freeze metadata could not be read: {exc}",className="academic-note")])
         if tab == "quality":
             q=quality_summary(PRICES)
             qa=pd.DataFrame([q])
@@ -221,11 +260,8 @@ def create_app() -> Dash:
 
     @app.callback(Output("selected-map-state","data"), Input("india-map","clickData"), prevent_initial_call=True)
     def map_click(click):
-        if not click or not click.get("points"): return no_update
-        p=click["points"][0]
-        # Choropleth exposes location; scatter fallback exposes hovertext.
-        val=p.get("location") or p.get("hovertext") or p.get("text")
-        return val if val in set(PRICES.state) else no_update
+        state = _map_click_state(click)
+        return state if state is not None else no_update
 
     @app.callback(Output("ripple-graph","figure"), Input("ripple-leader","value"),Input("ripple-date","date"),Input("ripple-lag","value"),State("commodity","value"),State("state","value"),State("dates","start_date"),State("dates","end_date"),prevent_initial_call=True)
     def update_ripple(leader,event_date,lag,commodity,state,start,end):

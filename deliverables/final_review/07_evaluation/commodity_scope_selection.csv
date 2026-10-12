@@ -1,0 +1,2 @@
+commodity,states,state_coverage_ratio,markets,observations,span_days,median_state_density,arrival_availability,coverage_score,eligible,recommended
+Onion,1,1.0,25,7794,1034,0.30150870406189556,0.8210161662817552,0.8776279036899916,False,False

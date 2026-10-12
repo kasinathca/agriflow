@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agriflow"
-version = "1.4.2"
+version = "1.4.3"
 description = "Spatiotemporal analysis of Indian agricultural mandi price transmission, weather shocks and market integration"
 requires-python = ">=3.10"
 readme = "README.md"

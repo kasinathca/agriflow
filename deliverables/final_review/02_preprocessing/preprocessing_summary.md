@@ -11,3 +11,7 @@
 
 `missing report != zero`. Network price inference does not use arbitrary forward filling and
 does not bridge non-consecutive reporting gaps.
+
+For the current CEDA scope, 8,499 raw canonical rows become 7,794 unique market-day rows.
+The processed panel has zero duplicate market-day keys and zero retained min/modal/max order
+violations. The 1,395 missing arrival values remain missing; they are not converted to zero.

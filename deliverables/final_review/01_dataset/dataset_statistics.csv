@@ -1,0 +1,13 @@
+metric,value
+raw_checkpoint_files,10
+raw_rows,8499
+processed_market_day_rows,7794
+states,1
+districts,4
+markets,25
+commodities,1
+date_min,2023-01-01
+date_max,2025-10-30
+arrival_coverage,0.821016
+coordinate_coverage,0.0
+weather_rows,0

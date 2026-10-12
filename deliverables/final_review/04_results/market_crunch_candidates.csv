@@ -1,0 +1,35 @@
+date,market_id,state,district,market,commodity,modal_price,arrivals,arrival_z,price_z,crunch_severity
+2024-09-23,maharashtra__ahmadnagar__rahuri,Maharashtra,Ahmadnagar,Rahuri,Onion,3600.0,0.6,-1.529858070405728,5.8455778333333335,6.042453634174082
+2024-09-20,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,4500.0,15.0,-1.9920976337209306,4.496598333333334,4.918114430715561
+2024-09-19,maharashtra__ahmadnagar__sangamner,Maharashtra,Ahmadnagar,Sangamner,Onion,3200.0,112.5,-1.5499790952914794,4.536487512096774,4.793970603085773
+2024-08-24,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3900.0,0.3,-3.145004531976745,3.5972786666666665,4.778228470030434
+2024-09-21,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,4500.0,21.0,-1.521523389534884,4.496598333333334,4.7470443431927025
+2024-08-25,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,4250.0,12.0,-2.227384755813954,4.121881805555556,4.685205701930526
+2024-09-22,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,4400.0,18.9,-1.6862243750000003,4.3467117222222225,4.662322965963235
+2023-10-25,maharashtra__ahmadnagar__sangamner,Maharashtra,Ahmadnagar,Sangamner,Onion,3000.0,102.0,-1.5788504461883404,4.10133283467742,4.394735458731531
+2024-10-20,maharashtra__ahmadnagar__rahuri,Maharashtra,Ahmadnagar,Rahuri,Onion,2800.0,3.6,-1.5254678138424824,4.0469385,4.324900377332594
+2025-05-23,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3500.0,1.0,-3.090104203488373,2.997732222222222,4.305245923819671
+2024-12-02,maharashtra__ahmadnagar__kopargaon,Maharashtra,Ahmadnagar,Kopargaon,Onion,4801.0,32.0,-1.5441052363325738,3.989460243043478,4.277856240185521
+2024-08-06,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3600.0,4.9,-2.7842309447674425,3.147618833333333,4.202314394920411
+2024-08-05,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3500.0,6.0,-2.697959000000001,2.997732222222222,4.03303623115766
+2024-08-10,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3400.0,6.0,-2.697959000000001,2.847845611111111,3.922908027268269
+2024-08-12,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3000.0,0.3,-3.145004531976745,2.248299166666667,3.865993099966462
+2024-11-26,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3000.0,0.3,-3.145004531976745,2.248299166666667,3.865993099966462
+2023-11-06,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3400.0,16.0,-1.9136685930232562,2.847845611111111,3.4310861412457174
+2024-12-04,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3350.0,18.9,-1.6862243750000003,2.7729023055555557,3.2453566582117688
+2024-11-25,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3250.0,16.8,-1.8509253604651166,2.6230156944444443,3.2103171219234388
+2024-10-27,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3200.0,15.9,-1.9215114970930238,2.548072388888889,3.191375774251381
+2024-11-02,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3000.0,15.0,-1.9920976337209306,2.248299166666667,3.003881176929367
+2024-11-06,maharashtra__ahmadnagar__shree_sairaj_krushi_market,Maharashtra,Ahmadnagar,Shree Sairaj Krushi Market,Onion,3605.0,6.45,-1.5176019374999998,2.581456225,2.994500272548828
+2024-10-23,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,3150.0,21.0,-1.521523389534884,2.4731290833333333,2.9036874638519374
+2024-10-05,maharashtra__ahmadnagar__shree_sairaj_krushi_market,Maharashtra,Ahmadnagar,Shree Sairaj Krushi Market,Onion,3500.0,6.61,-1.5120161010610766,2.45269,2.8812984791527483
+2024-08-09,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,2700.0,12.0,-2.227384755813954,1.7986393333333333,2.8629261782040705
+2024-10-16,maharashtra__ahmadnagar__shree_sairaj_krushi_market,Maharashtra,Ahmadnagar,Shree Sairaj Krushi Market,Onion,3400.0,4.95,-1.5699691541149068,2.3300555,2.8096195076829398
+2024-08-11,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,2600.0,12.0,-2.227384755813954,1.6487527222222222,2.77121424459885
+2024-09-18,maharashtra__ahmadnagar__shree_sairaj_krushi_market,Maharashtra,Ahmadnagar,Shree Sairaj Krushi Market,Onion,3350.0,5.16,-1.56263774378882,2.26873825,2.754815777021483
+2024-08-10,maharashtra__ahmadnagar__sangamner,Maharashtra,Ahmadnagar,Sangamner,Onion,2000.0,7.8,-1.837867708520179,1.925559447580645,2.661867183048075
+2024-08-07,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,2800.0,18.0,-1.7568105116279074,1.9485259444444445,2.623573237007007
+2024-05-04,maharashtra__ahmadnagar__sangamner,Maharashtra,Ahmadnagar,Sangamner,Onion,1961.0,55.2,-1.7075341816143492,1.8407042854838709,2.510749937365343
+2024-11-25,maharashtra__ahmadnagar__kopargaon,Maharashtra,Ahmadnagar,Kopargaon,Onion,2929.0,30.4,-1.5502509288154898,1.793556222173913,2.3706796207822025
+2024-08-13,maharashtra__amravati__amrawati_frui_veg_market,Maharashtra,Amravati,Amrawati(Frui & Veg. Market),Onion,2600.0,21.0,-1.521523389534884,1.6487527222222222,2.243528240057814
+2023-07-10,maharashtra__ahmadnagar__rahuri,Maharashtra,Ahmadnagar,Rahuri,Onion,1700.0,2.0,-1.5278092840095465,1.5738094166666667,2.1934168067867166

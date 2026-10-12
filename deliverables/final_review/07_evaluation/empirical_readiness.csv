@@ -1,0 +1,12 @@
+gate,status,value,threshold,detail
+real_data_only,PASS,['REAL'],['REAL'],Final empirical runs must contain no DEMO observations.
+nonempty_selected_scope,PASS,7794,> 0,The selected commodity/date scope must contain observations.
+source_provenance_present,PASS,1,>= 1 source,At least one non-empty source label is required.
+paper_acceptable_source_tier,PASS,['CURATED_OFFICIAL_DERIVED'],PRIMARY_OFFICIAL or CURATED_OFFICIAL_DERIVED only,"Final-paper freezes reject secondary mirrors, unverified user imports and unknown provenance even when observations are REAL."
+temporal_span,PASS,1034,365,Short spans weaken seasonality and temporal-network interpretation.
+state_breadth,WARN,1,3,"A pilot can be narrower, but national claims require broader state coverage."
+market_breadth,PASS,25,8,Network inference needs multiple sufficiently observed markets.
+observation_volume,PASS,7794,500,Very small panels are unsuitable for stable national inference.
+arrival_availability,PASS,0.821,0.2,Arrival-based crunch and supply analyses depend on non-missing arrivals.
+coordinate_coverage,WARN,0.0,0.7,Spatial/network maps and distance analysis require reviewed coordinates.
+weather_market_coverage,WARN,0.0,0.6,Weather-event analysis should not silently represent only a small market subset.

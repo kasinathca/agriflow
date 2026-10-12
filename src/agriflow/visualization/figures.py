@@ -67,6 +67,27 @@ def detect_geo_state_property(geojson: dict, data_states: set[str] | None = None
     return selected
 
 
+def _signed_ring_area(ring: list) -> float:
+    if len(ring) < 3:
+        return 0.0
+    return sum(
+        float(ring[i][0]) * float(ring[(i + 1) % len(ring)][1])
+        - float(ring[(i + 1) % len(ring)][0]) * float(ring[i][1])
+        for i in range(len(ring))
+    ) / 2
+
+
+def _rewind_plotly_geometry(geometry: dict) -> None:
+    """Use clockwise exteriors so d3/Plotly does not render polygon complements."""
+    polygons = [geometry["coordinates"]] if geometry["type"] == "Polygon" else geometry["coordinates"]
+    for polygon in polygons:
+        for index, ring in enumerate(polygon):
+            area = _signed_ring_area(ring)
+            should_reverse = (index == 0 and area > 0) or (index > 0 and area < 0)
+            if should_reverse:
+                ring.reverse()
+
+
 def prepare_state_geojson(geojson: dict, data_states: set[str]) -> tuple[dict, str]:
     """Validate a state GeoJSON and add canonical IDs used by Plotly."""
     state_property = detect_geo_state_property(geojson, data_states)
@@ -80,6 +101,7 @@ def prepare_state_geojson(geojson: dict, data_states: set[str]) -> tuple[dict, s
         geometry = feature.get("geometry")
         if not isinstance(geometry, dict) or geometry.get("type") not in {"Polygon", "MultiPolygon"}:
             continue
+        _rewind_plotly_geometry(geometry)
         name = canonical_state(feature["properties"].get(state_property))
         if not name:
             continue
@@ -161,7 +183,9 @@ def state_map(df: pd.DataFrame, markets: pd.DataFrame, commodity: str, geojson_p
             geo, _ = prepare_state_geojson(geo, set(state["state"]))
             fig=px.choropleth(state, geojson=geo, locations="state", featureidkey="properties.AGRIFLOW_STATE", color="modal_price",
                               color_continuous_scale="YlGnBu", hover_data={"markets":True,"observations":True,"modal_price":":,.0f"})
-            fig.update_geos(fitbounds="locations", visible=False, center=dict(lat=22.5, lon=79))
+            # Keep a stable national frame even when the current REAL dataset has
+            # observations for only one state. Linked panels may still drill down.
+            fig.update_geos(visible=False, center=dict(lat=22.5, lon=79), projection_scale=3.7)
             fig.update_layout(coloraxis_colorbar_title="₹/q")
             return _finish(fig, f"Median {commodity} price by state — click a state to drill down")
         except (OSError, UnicodeError, json.JSONDecodeError, TypeError, ValueError):
@@ -186,7 +210,7 @@ def state_map(df: pd.DataFrame, markets: pd.DataFrame, commodity: str, geojson_p
 def network_figure(edges: pd.DataFrame, markets: pd.DataFrame, scores: pd.DataFrame) -> go.Figure:
     if edges.empty: return empty_figure("No significant lead–lag edges meet the current thresholds.")
     m=ensure_market_id(markets)
-    coords=m.drop_duplicates("market_id").set_index("market_id")
+    coords=m.dropna(subset=["lat","lon"]).drop_duplicates("market_id").set_index("market_id")
     fig=go.Figure()
     for _,e in edges.iterrows():
         a_id=e.get("leader_id",e.leader); b_id=e.get("follower_id",e.follower)
@@ -201,6 +225,8 @@ def network_figure(edges: pd.DataFrame, markets: pd.DataFrame, scores: pd.DataFr
                                     customdata=np.stack([node.state,node.influence_score,node.outbound_edges],axis=-1),
                                     hovertemplate="%{text}<br>%{customdata[0]}<br>Influence %{customdata[1]:.3f}<br>Outbound significant edges %{customdata[2]:.0f}<extra></extra>",
                                     marker=dict(size=10+28*node.influence_score,color=node.influence_score,colorscale="YlGnBu",line=dict(width=1,color=WHITE),colorbar=dict(title="Influence")),showlegend=False))
+    if not fig.data:
+        return empty_figure("Significant lead–lag edges exist, but market coordinates are unavailable.")
     fig.update_geos(center=dict(lat=22.5,lon=79),projection_scale=4.2,showcountries=True,countrycolor=GRID,showland=True,landcolor="#F3F5F2")
     return _finish(fig,"Statistically inferred price-leadership network")
 
@@ -224,7 +250,9 @@ def distance_scatter(pairs: pd.DataFrame) -> go.Figure:
 def weather_price_figure(joined: pd.DataFrame, market_id: str, commodity: str) -> go.Figure:
     x=ensure_market_id(joined)
     x=x[(x.market_id.eq(market_id)) & (x.commodity.eq(commodity))].sort_values("date")
-    if x.empty: return empty_figure("No joined price/weather observations for this market.")
+    required={"rainfall_mm","temperature_c"}
+    if x.empty or not required.issubset(x.columns) or not x[list(required)].notna().any().any():
+        return empty_figure("REAL weather observations are unavailable for this market.")
     fig=go.Figure()
     fig.add_trace(go.Scatter(x=x.date,y=x.modal_price,name="Modal price",line=dict(color=GREEN,width=2),yaxis="y"))
     fig.add_trace(go.Bar(x=x.date,y=x.rainfall_mm,name="Rainfall",marker_color="rgba(43,122,120,.35)",yaxis="y2"))

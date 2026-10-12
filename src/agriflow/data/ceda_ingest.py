@@ -64,6 +64,26 @@ class CedaHistoricalIngestor:
         geographies.to_csv(gp, index=False)
         return cp, gp
 
+    def load_cached_catalogs(self) -> tuple[Path, Path]:
+        """Seed the connector from previously validated catalogs for resumable runs."""
+        cp = self.raw_dir / "ceda_catalog_commodities.csv"
+        gp = self.raw_dir / "ceda_catalog_geographies.csv"
+        if not cp.exists() or not gp.exists():
+            raise RuntimeError("Validated CEDA catalog cache is unavailable")
+        commodities = pd.read_csv(cp)
+        geographies = pd.read_csv(gp)
+        if not {"commodity_id", "commodity_name"}.issubset(commodities.columns):
+            raise RuntimeError("Cached CEDA commodity catalog is malformed")
+        required_geo = {
+            "census_state_id", "census_state_name",
+            "census_district_id", "census_district_name",
+        }
+        if not required_geo.issubset(geographies.columns):
+            raise RuntimeError("Cached CEDA geography catalog is malformed")
+        self.source._commodities = commodities.to_dict("records")
+        self.source._geographies = geographies.to_dict("records")
+        return cp, gp
+
     def _selected_commodities(self, names: Iterable[str]) -> list[dict]:
         unique: dict[int, dict] = {}
         for name in names:

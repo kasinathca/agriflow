@@ -1,3 +1,27 @@
+# AgriFlow v1.4.3 — CEDA Integration and National-Map Stabilization
+
+Release date: 2026-10-13
+
+## Fixed and validated
+- Kept the India choropleth on a stable national frame while state selection continues to filter linked KPIs and trends.
+- Normalized GeoJSON ring winding so Plotly renders state polygons rather than their geographic complements.
+- Prevented REAL prices from silently loading DEMO market coordinates or weather.
+- Added explicit unavailable states for REAL weather and coordinate-dependent network/geography views.
+- Normalized mixed timezone representations during resumable panel merges.
+- Preserved all-missing arrival groups without numerical runtime warnings.
+- Reused validated CEDA catalog caches during resumable downloads to avoid redundant catalog traffic.
+- Added an append-only CEDA ingestion provenance entry and current REAL readiness to the dashboard.
+
+## REAL CEDA evidence
+- Validated the live CEDA catalog: 453 commodities, 36 states/UTs and 640 district IDs.
+- Verified a two-district Onion/Maharashtra pilot for 2023–2025 and checkpoint replay.
+- Retained 10 successful district/year checkpoints after the full-state expansion encountered sustained CEDA latency/rate limiting.
+- Current processed evidence contains 7,794 REAL market-day observations, 25 markets and four districts from 2023-01-01 through 2025-10-30.
+- Arrival coverage is 82.10%; CEDA supplied no quantity unit field, so `arrival_unit=UNKNOWN` remains explicit.
+- Readiness is `READY_WITH_WARNINGS`: state breadth, reviewed coordinates and weather coverage remain incomplete. No final empirical freeze is claimed.
+
+---
+
 # AgriFlow v1.4.2 — Dashboard and Runtime Stabilization
 
 Release date: 2026-10-13

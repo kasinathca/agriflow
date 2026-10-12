@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from agriflow.data.processing import (
     aggregate_market_daily,
@@ -6,6 +7,7 @@ from agriflow.data.processing import (
     normalize_prices,
     quality_summary,
 )
+from agriflow.analytics.weather import robust_z
 
 
 def test_normalize_and_invalid_order():
@@ -77,3 +79,22 @@ def test_merge_market_daily_preserves_distinct_rows_and_prefers_authority():
     out=merge_market_daily(existing,incoming)
     assert len(out)==3
     assert out.loc[out.date.eq('2024-01-01'),'modal_price'].iloc[0]==100
+
+
+def test_merge_market_daily_normalizes_mixed_timezone_dates():
+    base={
+        'state':'Maharashtra','district':'Nashik','market':'Lasalgaon',
+        'market_id':'maharashtra__nashik__lasalgaon','commodity':'Onion',
+        'modal_price':1000,'source_tier':'CURATED_OFFICIAL_DERIVED',
+    }
+    existing=pd.DataFrame([{**base,'date':'2024-01-01T00:00:00+00:00'}])
+    incoming=pd.DataFrame([{**base,'date':pd.Timestamp('2024-01-01')}])
+    out=merge_market_daily(existing,incoming)
+    assert len(out)==1
+    assert out.iloc[0].date==pd.Timestamp('2024-01-01')
+    assert out.date.dt.tz is None
+
+
+def test_robust_z_preserves_all_missing_series():
+    out=robust_z(pd.Series([np.nan,np.nan]))
+    assert out.isna().all()

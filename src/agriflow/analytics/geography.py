@@ -8,6 +8,11 @@ from scipy.stats import spearmanr
 from agriflow.analytics.lead_lag import market_returns
 from agriflow.data.identity import ensure_market_id
 
+DISTANCE_COLUMNS = [
+    "market_a_id", "market_b_id", "market_a", "market_b", "state_a", "state_b",
+    "distance_km", "return_corr", "overlap", "distance_bin",
+]
+
 
 def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     r = 6371.0088
@@ -20,7 +25,7 @@ def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 def distance_similarity(df: pd.DataFrame, markets: pd.DataFrame, commodity: str, min_overlap: int = 35) -> pd.DataFrame:
     r = market_returns(df, commodity)
     if r.empty:
-        return pd.DataFrame()
+        return pd.DataFrame(columns=DISTANCE_COLUMNS)
     pivot = r.pivot(index="date", columns="market_id", values="return")
     m = ensure_market_id(markets).dropna(subset=["lat", "lon"]).copy()
     coords = m.drop_duplicates("market_id").set_index("market_id")
@@ -59,7 +64,7 @@ def distance_similarity(df: pd.DataFrame, markets: pd.DataFrame, commodity: str,
         })
     out = pd.DataFrame(rows)
     if out.empty:
-        return out
+        return pd.DataFrame(columns=DISTANCE_COLUMNS)
     bins = [0, 100, 250, 500, 1000, np.inf]
     labels = ["0–100", "100–250", "250–500", "500–1000", ">1000"]
     out["distance_bin"] = pd.cut(out.distance_km, bins=bins, labels=labels, right=False)

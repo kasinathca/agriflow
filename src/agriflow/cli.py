@@ -316,7 +316,14 @@ def cmd_fetch_ceda(args):
     states=_split_values(args.state) or None
     src=CedaHistoricalSource(settings.ceda_api_key)
     ing=CedaHistoricalIngestor(src,settings.raw_dir,settings.processed_dir)
-    ing.cache_catalogs()
+    catalog_paths = [
+        settings.raw_dir / "ceda_catalog_commodities.csv",
+        settings.raw_dir / "ceda_catalog_geographies.csv",
+    ]
+    if all(path.exists() for path in catalog_paths):
+        ing.load_cached_catalogs()
+    else:
+        ing.cache_catalogs()
     jobs=ing.plan(commodities,args.start,args.end,states=states,district_limit=args.district_limit)
     print(f"CEDA plan: {len(jobs):,} resumable commodity × district × year jobs")
     if args.dry_run:
@@ -335,6 +342,19 @@ def cmd_fetch_ceda(args):
     except RuntimeError as exc:
         raise SystemExit(str(exc))
     market_path=_update_market_index(daily)
+    summary_path=ing.chunk_dir/"_last_run_summary.json"
+    ceda_rows=int(daily.source.fillna("").astype(str).str.contains("CEDA_AGMARKNET").sum())
+    _record_ingest_provenance(
+        source="CEDA_AGMARKNET",
+        source_tier=CURATED_OFFICIAL_DERIVED,
+        rows=ceda_rows,
+        raw_file=summary_path,
+        note=(
+            "Resumable CEDA API ingestion over AGMARKNET data; "
+            f"planned={summary['planned']}, fetched={summary['fetched']}, "
+            f"cached={summary['cached']}, failed={summary['failed']}."
+        ),
+    )
     print(f"Rebuilt {len(daily):,} canonical market-day records -> {out}")
     print(f"Market coordinate index: {market_path}")
     policy=SelectionPolicy(target_count=args.target_count)

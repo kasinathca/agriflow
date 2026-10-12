@@ -1,0 +1,26 @@
+state,district,market,market_id,observations,first_date,last_date,arrival_coverage
+Maharashtra,Ahmadnagar,Ahmednagar,maharashtra__ahmadnagar__ahmednagar,278,2023-01-07,2025-10-27,0.9424460431654677
+Maharashtra,Ahmadnagar,Akole,maharashtra__ahmadnagar__akole,233,2023-01-01,2025-10-30,0.944206008583691
+Maharashtra,Ahmadnagar,Jamkhed,maharashtra__ahmadnagar__jamkhed,254,2023-01-07,2025-10-30,0.9015748031496063
+Maharashtra,Ahmadnagar,Karjat,maharashtra__ahmadnagar__karjat,323,2023-10-18,2025-10-29,0.9628482972136223
+Maharashtra,Ahmadnagar,Kopargaon,maharashtra__ahmadnagar__kopargaon,614,2023-01-04,2025-10-30,0.9332247557003257
+Maharashtra,Ahmadnagar,Newasa(Ghodegaon),maharashtra__ahmadnagar__newasa_ghodegaon,352,2023-01-07,2025-10-29,0.9232954545454546
+Maharashtra,Ahmadnagar,Om Chaitanya Multistate Agro Purpose CoOp Society,maharashtra__ahmadnagar__om_chaitanya_multistate_agro_purpose_coop_society,230,2023-07-07,2025-10-28,0.9173913043478261
+Maharashtra,Ahmadnagar,Parner,maharashtra__ahmadnagar__parner,367,2023-01-01,2025-10-29,0.9291553133514986
+Maharashtra,Ahmadnagar,Pathardi,maharashtra__ahmadnagar__pathardi,312,2023-01-10,2025-10-29,0.967948717948718
+Maharashtra,Ahmadnagar,Rahata,maharashtra__ahmadnagar__rahata,357,2023-01-01,2025-10-28,0.9243697478991597
+Maharashtra,Ahmadnagar,Rahuri,maharashtra__ahmadnagar__rahuri,318,2023-01-01,2025-10-28,0.9685534591194969
+Maharashtra,Ahmadnagar,Rahuri(Vambori),maharashtra__ahmadnagar__rahuri_vambori,376,2023-01-07,2025-10-30,0.9335106382978723
+Maharashtra,Ahmadnagar,Sangamner,maharashtra__ahmadnagar__sangamner,628,2023-01-04,2025-10-30,0.928343949044586
+Maharashtra,Ahmadnagar,Shevgaon,maharashtra__ahmadnagar__shevgaon,242,2023-02-13,2025-10-30,0.9173553719008265
+Maharashtra,Ahmadnagar,Shree Sairaj Krushi Market,maharashtra__ahmadnagar__shree_sairaj_krushi_market,123,2023-07-05,2025-10-15,0.9186991869918699
+Maharashtra,Ahmadnagar,Shrigonda,maharashtra__ahmadnagar__shrigonda,165,2023-01-23,2025-06-15,0.9696969696969697
+Maharashtra,Ahmadnagar,Shrirampur,maharashtra__ahmadnagar__shrirampur,307,2023-01-10,2025-10-29,0.9543973941368078
+Maharashtra,Akola,Akola,maharashtra__akola__akola,620,2023-05-15,2025-10-30,0.9161290322580645
+Maharashtra,Amravati,Amrawati(Frui & Veg. Market),maharashtra__amravati__amrawati_frui_veg_market,747,2023-01-02,2025-10-29,0.9330655957161981
+Maharashtra,Aurangabad,Bhagyoday Cotton and Agri Market,maharashtra__aurangabad__bhagyoday_cotton_and_agri_market,35,2023-07-01,2023-09-22,0.0
+Maharashtra,Aurangabad,Chattrapati Sambhajinagar,maharashtra__aurangabad__chattrapati_sambhajinagar,263,2023-01-01,2023-11-30,0.0
+Maharashtra,Aurangabad,Gangapur,maharashtra__aurangabad__gangapur,132,2023-03-25,2023-11-30,0.0
+Maharashtra,Aurangabad,Lasur Station,maharashtra__aurangabad__lasur_station,197,2023-01-02,2023-11-28,0.0
+Maharashtra,Aurangabad,Paithan,maharashtra__aurangabad__paithan,59,2023-01-04,2023-10-27,0.0
+Maharashtra,Aurangabad,Vaijpur,maharashtra__aurangabad__vaijpur,262,2023-01-03,2023-11-30,0.0

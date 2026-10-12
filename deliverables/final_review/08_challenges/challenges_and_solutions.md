@@ -20,8 +20,17 @@
 
 ## Authoritative empirical acquisition
 
-- **Problem:** no API credential is configured; the official manual export requires personal
-  fields and CAPTCHA.
-- **Why it matters:** REAL dashboard and paper evidence cannot be generated honestly.
-- **Solution:** preserve ready CEDA, OGD API and dedicated official CSV import routes.
-- **Remaining limitation:** a human must supply a credential or complete the official export.
+- **Problem:** the credentialed CEDA service validated successfully, but the full Maharashtra
+  expansion later stalled/rate-limited an unfinished historical job.
+- **Why it matters:** completed checkpoints are legitimate evidence, but they are not complete
+  statewide coverage.
+- **Solution:** retain commodity/district/year checkpoints, reuse validated local catalogs,
+  rebuild only from successful chunks and report coverage explicitly.
+- **Remaining limitation:** resume the same CEDA command when service capacity permits.
+
+## REAL auxiliary-data isolation
+
+- **Problem:** REAL prices could independently fall back to DEMO markets/weather.
+- **Why it matters:** synthetic coordinates or weather could silently contaminate empirical analysis.
+- **Solution:** REAL mode now returns typed empty auxiliary frames and explicit unavailable views.
+- **Remaining limitation:** coordinate and weather analysis waits for reviewed real coordinates.

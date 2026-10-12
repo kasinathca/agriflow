@@ -1,11 +1,16 @@
 # Dataset status
 
-No authoritative REAL dataset is available in this environment. The only active dataset is
-the deterministic `AGRIFLOW_DEMO_SYNTHETIC` fixture covering five commodities, eight states
-and sixteen markets from 2023-01-01 through 2025-12-31. It is suitable for software testing
-only and is excluded from empirical findings, figures and screenshots.
+The active analytical panel is REAL historical Onion data obtained from the authenticated
+CEDA Agri Market API, a curated route over AGMARKNET observations. It contains 8,499 raw
+canonical rows from 10 completed district/year checkpoints and 7,794 unique market-day rows.
+Coverage spans 25 markets in Ahmadnagar, Akola, Amravati and Aurangabad from 2023-01-01 to
+2025-10-30.
 
-To create legitimate dataset evidence, provide `CEDA_API_KEY` or `DATA_GOV_API_KEY` in the
-ignored `.env`, or complete an official portal export and run the dedicated
-`import-ceda-csv` / `import-data-gov-csv` command. Then run the readiness and freeze workflow
-before generating review metrics.
+All observations are labelled `source=CEDA_AGMARKNET`,
+`source_tier=CURATED_OFFICIAL_DERIVED`, and `data_mode=REAL`. Arrival values are present for
+82.10% of processed rows. The live quantity response exposes a `quantity` field but no unit
+field, so `arrival_unit=UNKNOWN` is preserved for every row.
+
+The full Maharashtra request did not finish because CEDA repeatedly stalled/rate-limited an
+unfinished historical job. Statewide completeness is therefore not claimed. See the CSVs in
+this directory for exact coverage and missingness.

@@ -1,24 +1,40 @@
 {
-  "project_version": "1.4.2",
+  "project_version": "1.4.3",
   "generated_on": "2026-10-13",
-  "source_commit": "7ac233a",
-  "ci_state_at_generation": "PENDING_RELEASE_CI",
-  "test_count": 48,
-  "data_mode": "DEMO",
-  "source_tiers": ["DEMO"],
-  "demo_date_range": ["2023-01-01", "2025-12-31"],
-  "demo_commodity_scope": ["Onion", "Tomato", "Potato", "Wheat", "Rice"],
-  "empirical_evidence_status": "BLOCKED_NO_AUTHORITATIVE_DATA",
-  "course_pdf_status": "NOT_PROVIDED",
-  "freeze_identifier": null,
-  "freeze_integrity_status": "NOT_APPLICABLE",
-  "real_observation_count": 0,
-  "real_market_count": 0,
-  "real_state_count": 0,
-  "coordinate_coverage": null,
-  "weather_coverage": null,
-  "important_result_files": [],
-  "figure_files": [],
-  "screenshot_files": [],
-  "note": "Synthetic DEMO outputs are excluded from empirical final-review evidence."
+  "release_ref": "v1.4.3",
+  "data_mode": "REAL",
+  "source_tiers": [
+    "CURATED_OFFICIAL_DERIVED"
+  ],
+  "source": "CEDA_AGMARKNET",
+  "empirical_readiness_status": "READY_WITH_WARNINGS",
+  "real_observation_count": 7794,
+  "real_market_count": 25,
+  "real_district_count": 4,
+  "real_state_count": 1,
+  "date_range": [
+    "2023-01-01",
+    "2025-10-30"
+  ],
+  "arrival_coverage": 0.821016,
+  "arrival_unit": "UNKNOWN",
+  "coordinate_coverage": 0.0,
+  "weather_market_coverage": 0.0,
+  "full_maharashtra_download_complete": false,
+  "final_freeze_identifier": null,
+  "important_result_files": [
+    "influence_onion.csv",
+    "integration_onion.csv",
+    "lead_lag_onion.csv",
+    "market_crunch_candidates.csv"
+  ],
+  "figure_files": [
+    "real_onion_arrivals_price.html",
+    "real_onion_india_map.html",
+    "real_onion_price_trend.html"
+  ],
+  "screenshot_files": [
+    "real_overview.png"
+  ],
+  "academic_integrity": "REAL CEDA/AGMARKNET evidence only. State breadth, coordinates, weather, full-state ingestion and final freeze remain incomplete."
 }

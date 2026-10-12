@@ -38,8 +38,12 @@ def normalize_prices(df: pd.DataFrame) -> pd.DataFrame:
     raw_dates = out["date"].astype(str).str.strip()
     slash = raw_dates.str.contains("/", regex=False)
     parsed = pd.Series(pd.NaT, index=out.index, dtype="datetime64[ns]")
-    parsed.loc[slash] = pd.to_datetime(raw_dates.loc[slash], errors="coerce", dayfirst=True)
-    parsed.loc[~slash] = pd.to_datetime(raw_dates.loc[~slash], errors="coerce")
+    parsed.loc[slash] = pd.to_datetime(
+        raw_dates.loc[slash], errors="coerce", dayfirst=True, utc=True
+    ).dt.tz_localize(None)
+    parsed.loc[~slash] = pd.to_datetime(
+        raw_dates.loc[~slash], errors="coerce", utc=True
+    ).dt.tz_localize(None)
     out["date"] = parsed
     for col in ["min_price", "max_price", "modal_price", "arrivals"]:
         if col not in out:
@@ -115,7 +119,9 @@ def merge_market_daily(existing: pd.DataFrame, incoming: pd.DataFrame) -> pd.Dat
         sort=False,
     )
     combined = ensure_market_id(combined)
-    combined["date"] = pd.to_datetime(combined["date"], errors="coerce")
+    combined["date"] = pd.to_datetime(
+        combined["date"], errors="coerce", utc=True
+    ).dt.tz_localize(None)
     tier_rank = {
         "DEMO": 0,
         "UNKNOWN": 1,

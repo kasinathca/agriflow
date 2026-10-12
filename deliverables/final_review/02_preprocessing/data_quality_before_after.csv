@@ -1,0 +1,6 @@
+metric,raw,processed
+rows,8499,7794
+duplicate_keys,705,0
+missing_modal_price,0,0
+missing_arrivals,1435,1395
+invalid_price_order,0,0

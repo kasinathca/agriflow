@@ -4,6 +4,8 @@
   "MIN_EDGE_CORR": 0.3,
   "FDR_ALPHA": 0.05,
   "MAX_NETWORK_MARKETS": 40,
-  "data_mode": "DEMO",
-  "empirical_results_claimed": false
+  "data_mode": "REAL",
+  "source_tier": "CURATED_OFFICIAL_DERIVED",
+  "exploratory_real_results_available": true,
+  "paper_final_results_claimed": false
 }

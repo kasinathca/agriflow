@@ -1,0 +1,7 @@
+leader_id,follower_id,leader,follower,lag_days,corr,p_value,q_value,overlap
+maharashtra__amravati__amrawati_frui_veg_market,maharashtra__ahmadnagar__karjat,Amrawati(Frui & Veg. Market),Karjat,3,0.3109689071109079,0.0002843166300734856,0.006254965861616683,132
+maharashtra__amravati__amrawati_frui_veg_market,maharashtra__aurangabad__gangapur,Amrawati(Frui & Veg. Market),Gangapur,3,-0.4509026227845846,0.000235205933623614,0.006254965861616683,62
+maharashtra__ahmadnagar__kopargaon,maharashtra__aurangabad__gangapur,Kopargaon,Gangapur,6,0.4400958454322764,0.0044864108753536105,0.024675259814444857,40
+maharashtra__aurangabad__vaijpur,maharashtra__aurangabad__gangapur,Vaijpur,Gangapur,7,0.39001709126658507,0.003552515872731114,0.024675259814444857,54
+maharashtra__aurangabad__lasur_station,maharashtra__ahmadnagar__sangamner,Lasur Station,Sangamner,7,0.32924844163242506,0.0032459062955280714,0.024675259814444857,78
+maharashtra__aurangabad__chattrapati_sambhajinagar,maharashtra__ahmadnagar__kopargaon,Chattrapati Sambhajinagar,Kopargaon,5,-0.3764874787495128,0.0023564934121527957,0.024675259814444857,63

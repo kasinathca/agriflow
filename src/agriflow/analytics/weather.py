@@ -5,9 +5,17 @@ from datetime import timedelta
 
 from agriflow.data.identity import ensure_market_id
 
+EVENT_STUDY_COLUMNS = [
+    "market_id", "market", "state", "commodity", "event_date", "baseline_date",
+    "response_date", "horizon_days", "weather_z", "event_sign",
+    "price_change_pct", "arrival_change_pct",
+]
+
 
 def robust_z(s: pd.Series) -> pd.Series:
     s = pd.to_numeric(s, errors="coerce")
+    if not s.notna().any():
+        return pd.Series(np.nan, index=s.index, dtype=float)
     med = s.median()
     mad = (s - med).abs().median()
     if pd.isna(mad) or mad == 0:
@@ -95,12 +103,12 @@ def event_study(
     """
     x = ensure_market_id(joined).copy()
     if weather_col not in x.columns or x.empty:
-        return pd.DataFrame()
+        return pd.DataFrame(columns=EVENT_STUDY_COLUMNS)
     x["date"] = pd.to_datetime(x.date)
     x = x.sort_values(["market_id", "date"])
     events = x[x[weather_col].abs() >= threshold].copy()
     if events.empty:
-        return pd.DataFrame()
+        return pd.DataFrame(columns=EVENT_STUDY_COLUMNS)
     events = _decluster_events(events, "market_id", weather_col, separation_days)
     rows = []
     groups = {k: g.set_index("date").sort_index() for k, g in x.groupby("market_id")}
@@ -138,7 +146,7 @@ def event_study(
                 "price_change_pct": (float(f.modal_price) / float(b.modal_price) - 1) * 100 if b.modal_price else np.nan,
                 "arrival_change_pct": (float(f.arrivals) / float(b.arrivals) - 1) * 100 if pd.notna(b.get("arrivals")) and b.arrivals else np.nan,
             })
-    return pd.DataFrame(rows)
+    return pd.DataFrame(rows, columns=EVENT_STUDY_COLUMNS)
 
 
 def event_study_summary(events: pd.DataFrame) -> pd.DataFrame:

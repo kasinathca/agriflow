@@ -1,6 +1,6 @@
 # AgriFlow
 
-**Release:** v1.4.2 — dashboard and runtime stabilization
+**Release:** v1.4.3 — CEDA integration and national-map stabilization
 
 **Spatiotemporal Analysis of Price Transmission, Weather Shocks, and Market Integration Across Indian Agricultural Mandis**
 
@@ -309,7 +309,7 @@ pytest -q
 python scripts/validate_project.py
 ```
 
-v1.4.2 contains **48 automated tests**, including known-answer tests for a two-day price leader, duplicate market names across states, POWER checkpoint/rebuild behavior, spatial permutation stability, weather-event declustering, vector-boundary provenance, empirical-freeze tamper detection, multi-year leadership persistence, robust choropleth matching, arrival aggregation and safe panel merging.
+v1.4.3 contains **56 automated tests**, including known-answer tests for a two-day price leader, duplicate market names across states, POWER checkpoint/rebuild behavior, spatial permutation stability, weather-event declustering, vector-boundary provenance, empirical-freeze tamper detection, multi-year leadership persistence, national-map state selection, GeoJSON winding, REAL/DEMO isolation, arrival aggregation and safe panel merging.
 
 ## 10. Documentation order
 

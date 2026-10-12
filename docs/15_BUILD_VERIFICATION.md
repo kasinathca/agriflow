@@ -17,7 +17,6 @@
   software verification.
 
 ---
-
 Verification date: 2026-10-07
 
 ## Development-tree verification
@@ -104,3 +103,30 @@ The final v1.4 ZIP was independently extracted and validated again after the sou
 - end-to-end DEMO `agriflow analyze`: **PASS**.
 
 The archive SHA-256 is reported alongside the downloadable artifact because the ZIP hash necessarily changes if this verification record itself is updated.
+# v1.4.3 REAL CEDA and map verification
+
+Verification date: 2026-10-13
+
+- Python 3.12.8 compilation: **PASS**.
+- Automated tests: **56/56 PASS**.
+- Structural validator (including its embedded test run): **PASS**.
+- Warning-strict REAL analysis (`PYTHONWARNINGS=error`): **PASS**.
+- Live CEDA catalogs: **453 commodities, 36 states/UTs, 640 district IDs**.
+- Two-district Onion/Maharashtra 2023–2025 pilot and cached replay: **PASS**.
+- Retained checkpoint evidence: **8,499 raw canonical rows, 7,794 market-day rows,
+  25 markets, four districts, 2023-01-01 through 2025-10-30**.
+- Source/data labels: `CEDA_AGMARKNET`, `CURATED_OFFICIAL_DERIVED`, `REAL`.
+- Arrival coverage: **82.10%**; API quantity unit absent, preserved as `UNKNOWN`.
+- Duplicate processed market-day keys: **0**; retained price-order violations: **0**.
+- REAL/DEMO auxiliary isolation: **PASS**; missing coordinates/weather remain explicit.
+- Interactive Chrome validation: REAL badge, controls, polygon click, national-frame map,
+  overview, influence, weather, geography, data quality, research status and sources: **PASS**.
+- Browser console errors attributable to AgriFlow: **0**; server tracebacks: **0**.
+- One-click launcher: version-change install/start and immediate reuse/start: **PASS**;
+  existing `.env` preserved and credential value never printed.
+- Readiness: **READY_WITH_WARNINGS**; state breadth, coordinate coverage and weather coverage
+  are incomplete. No final empirical freeze or paper-final claim is made.
+- Full Maharashtra expansion: **incomplete** after sustained CEDA request latency/rate limiting;
+  successful district/year checkpoints were preserved and processed.
+
+---

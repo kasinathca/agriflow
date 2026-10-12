@@ -22,7 +22,10 @@ class HttpClient:
             try:
                 r = self.session.request(method, url, timeout=self.timeout, **kwargs)
                 if r.status_code == 429:
-                    time.sleep(2 ** (attempt + 1))
+                    last = SourceError("HTTP 429 Too Many Requests")
+                    retry_after = r.headers.get("Retry-After", "")
+                    delay = int(retry_after) if retry_after.isdigit() else 2 ** (attempt + 1)
+                    time.sleep(min(delay, 60))
                     continue
                 r.raise_for_status()
                 return r.json()
