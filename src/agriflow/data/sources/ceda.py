@@ -7,9 +7,10 @@ This module keeps the API-specific IDs at the boundary and emits a canonical
 AgriFlow market-day schema with human-readable names.
 """
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, timedelta
-from typing import Any, Iterable
+from typing import Any
 
 import pandas as pd
 
@@ -279,7 +280,13 @@ class CedaHistoricalSource:
                 "arrivals" if "arrivals" in q.columns else None
             )
             if qty_col:
-                q = q[key + [qty_col]].rename(columns={qty_col: "arrivals"})
+                unit_col = next(
+                    (column for column in ("arrival_unit", "quantity_unit", "unit") if column in q.columns),
+                    None,
+                )
+                q = q[key + [qty_col] + ([unit_col] if unit_col else [])].rename(
+                    columns={qty_col: "arrivals", **({unit_col: "arrival_unit"} if unit_col else {})}
+                )
                 prices = prices.merge(q, on=key, how="left")
             else:
                 prices["arrivals"] = pd.NA
@@ -300,6 +307,7 @@ class CedaHistoricalSource:
             "max_price": prices.get("max_price"),
             "modal_price": prices.get("modal_price"),
             "arrivals": prices.get("arrivals"),
+            "arrival_unit": prices.get("arrival_unit", "UNKNOWN"),
             "source": "CEDA_AGMARKNET",
             "source_tier": CURATED_OFFICIAL_DERIVED,
             "data_mode": "REAL",

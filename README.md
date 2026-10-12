@@ -1,6 +1,6 @@
 # AgriFlow
 
-**Release:** v1.4.0 — provenance-gated real-data bootstrap
+**Release:** v1.4.2 — dashboard and runtime stabilization
 
 **Spatiotemporal Analysis of Price Transmission, Weather Shocks, and Market Integration Across Indian Agricultural Mandis**
 
@@ -14,12 +14,15 @@ AgriFlow is a local-first analytical system for studying agricultural wholesale 
 
 ### Windows
 ```bat
-setup.bat
+start_agriflow.bat
 ```
-Later launches:
-```bat
-run.bat
-```
+
+Double-clicking `start_agriflow.bat` is the recommended one-click path. It creates or
+reuses only the repository-local `.venv`, preserves an existing `.env`, generates the
+DEMO fixture when absent, reuses or fetches the state GeoJSON, runs `doctor`, opens the
+local URL and starts the dashboard. Press `CTRL+C` in its console to stop the server.
+
+The older two-step `setup.bat` / `run.bat` path remains available.
 
 ### Linux/macOS
 ```bash
@@ -28,7 +31,7 @@ chmod +x setup.sh run.sh
 ./run.sh
 ```
 
-First run verifies Python 3.10+, creates `.venv`, installs dependencies, creates `.env`, generates deterministic demo data, attempts to cache an India ADM1 vector boundary, runs the analytical export pipeline and executes the automated test suite.
+First run verifies Python 3.10+, creates `.venv`, installs dependencies, creates `.env`, generates deterministic demo data and attempts to cache an India ADM1 vector boundary. Later starts skip dependency installation when the environment and project checksum are unchanged.
 
 Open **http://127.0.0.1:8050** after launching.
 
@@ -306,7 +309,7 @@ pytest -q
 python scripts/validate_project.py
 ```
 
-v1.4 contains **41 automated tests**, including known-answer tests for a two-day price leader, duplicate market names across states, POWER checkpoint/rebuild behavior, spatial permutation stability, weather-event declustering, vector-boundary provenance, empirical-freeze tamper detection and multi-year leadership persistence.
+v1.4.2 contains **48 automated tests**, including known-answer tests for a two-day price leader, duplicate market names across states, POWER checkpoint/rebuild behavior, spatial permutation stability, weather-event declustering, vector-boundary provenance, empirical-freeze tamper detection, multi-year leadership persistence, robust choropleth matching, arrival aggregation and safe panel merging.
 
 ## 10. Documentation order
 

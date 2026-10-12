@@ -1,0 +1,9 @@
+{
+  "MAX_LAG_DAYS": 7,
+  "MIN_OVERLAP_DAYS": 35,
+  "MIN_EDGE_CORR": 0.3,
+  "FDR_ALPHA": 0.05,
+  "MAX_NETWORK_MARKETS": 40,
+  "data_mode": "DEMO",
+  "empirical_results_claimed": false
+}

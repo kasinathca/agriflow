@@ -2,36 +2,55 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import shutil
 import sys
-from hashlib import sha256
 from datetime import datetime, timezone
+from hashlib import sha256
+from pathlib import Path
+
 import pandas as pd
 
-from agriflow.config import settings
-from agriflow.data.demo import generate_demo
-from agriflow.data.processing import normalize_prices, aggregate_market_daily, quality_summary
-from agriflow.data.sources.data_gov import DataGovMandiSource
-from agriflow.data.sources.ceda import CedaHistoricalSource
-from agriflow.data.ceda_ingest import CedaHistoricalIngestor
-from agriflow.data.identity import ensure_market_id
-from agriflow.data.manual_import import canonicalize_mandi_export
-from agriflow.data.provenance import (
-    PRIMARY_OFFICIAL, CURATED_OFFICIAL_DERIVED, SECONDARY_MIRROR, USER_SUPPLIED, split_tiers
-)
-from agriflow.data.weather_ingest import PowerHistoricalIngestor
-from agriflow.data.sources.geo import GeographySource
-from agriflow.data.sources.nasa_power import NasaPowerSource
-from agriflow.analytics.coverage import coverage_audit, commodity_coverage_score
+from agriflow.analytics.coverage import commodity_coverage_score, coverage_audit
 from agriflow.analytics.events import detect_market_crunches
-from agriflow.analytics.geography import distance_similarity, distance_effect_summary
-from agriflow.analytics.weather import join_market_weather, event_study, event_study_summary
+from agriflow.analytics.geography import distance_effect_summary, distance_similarity
+from agriflow.analytics.integration import market_integration_pairs
 from agriflow.analytics.lead_lag import infer_lead_lag_edges
 from agriflow.analytics.network import influence_scores
-from agriflow.analytics.integration import market_integration_pairs
-from agriflow.analytics.selection import SelectionPolicy, write_selection_report, commodity_scope_table
-from agriflow.research.freeze import ReadinessPolicy, empirical_readiness, freeze_scope, verify_freeze
+from agriflow.analytics.selection import (
+    SelectionPolicy,
+    commodity_scope_table,
+    write_selection_report,
+)
+from agriflow.analytics.weather import event_study, event_study_summary, join_market_weather
+from agriflow.config import settings
+from agriflow.data.ceda_ingest import CedaHistoricalIngestor
+from agriflow.data.demo import generate_demo
+from agriflow.data.identity import ensure_market_id
+from agriflow.data.manual_import import canonicalize_mandi_export
+from agriflow.data.processing import (
+    aggregate_market_daily,
+    merge_market_daily,
+    normalize_prices,
+    quality_summary,
+)
+from agriflow.data.provenance import (
+    CURATED_OFFICIAL_DERIVED,
+    PRIMARY_OFFICIAL,
+    SECONDARY_MIRROR,
+    USER_SUPPLIED,
+    split_tiers,
+)
+from agriflow.data.sources.ceda import CedaHistoricalSource
+from agriflow.data.sources.data_gov import DataGovMandiSource
+from agriflow.data.sources.geo import GeographySource
+from agriflow.data.sources.nasa_power import NasaPowerSource
+from agriflow.data.weather_ingest import PowerHistoricalIngestor
+from agriflow.research.freeze import (
+    ReadinessPolicy,
+    empirical_readiness,
+    freeze_scope,
+    verify_freeze,
+)
 from agriflow.research.runner import analyze_frozen_scope
 
 
@@ -65,6 +84,15 @@ def _record_ingest_provenance(*, source: str, source_tier: str, rows: int, raw_f
     path=settings.raw_dir/"ingest_provenance.jsonl"
     with path.open("a",encoding="utf-8") as fh:
         fh.write(json.dumps(record,sort_keys=True)+"\n")
+
+
+def _write_processed_panel(incoming: pd.DataFrame) -> tuple[pd.DataFrame, Path]:
+    """Merge new market-day rows without destroying compatible prior imports."""
+    path = settings.processed_dir / "market_daily.csv"
+    existing = pd.read_csv(path) if path.exists() else pd.DataFrame()
+    combined = merge_market_daily(existing, incoming)
+    combined.to_csv(path, index=False)
+    return combined, path
 
 def _update_market_index(daily: pd.DataFrame) -> Path:
     """Create/update the unique real-data market coordinate index without discarding known coordinates."""
@@ -103,8 +131,8 @@ def cmd_fetch_current(args):
     if df.empty: raise SystemExit("No records returned for these filters.")
     raw=settings.raw_dir/"data_gov_current.csv"; df.to_csv(raw,index=False)
     norm=normalize_prices(df.assign(source="DATA_GOV_IN_AGMARKNET",source_tier=PRIMARY_OFFICIAL,data_mode="REAL"))
-    daily=aggregate_market_daily(norm); out=settings.processed_dir/"market_daily.csv"; daily.to_csv(out,index=False)
-    market_path=_update_market_index(daily)
+    daily=aggregate_market_daily(norm); panel,out=_write_processed_panel(daily)
+    market_path=_update_market_index(panel)
     _record_ingest_provenance(source="DATA_GOV_IN_AGMARKNET",source_tier=PRIMARY_OFFICIAL,rows=len(daily),raw_file=raw,note="Direct OGD/AGMARKNET API ingestion")
     print(f"Saved {len(daily):,} normalized records to {out}")
     print(f"Market coordinate index: {market_path}")
@@ -122,8 +150,8 @@ def cmd_import(args):
     df["source_tier"]=args.source_tier
     df["data_mode"]="REAL"
     norm=normalize_prices(df); daily=aggregate_market_daily(norm)
-    out=settings.processed_dir/"market_daily.csv"; daily.to_csv(out,index=False)
-    market_path=_update_market_index(daily)
+    panel,out=_write_processed_panel(daily)
+    market_path=_update_market_index(panel)
     raw=settings.raw_dir/f"import_{p.name}"
     shutil.copy2(p,raw)
     _record_ingest_provenance(source=args.source or "USER_IMPORT",source_tier=args.source_tier,rows=len(daily),raw_file=raw,note="Generic user CSV import")
@@ -147,8 +175,8 @@ def cmd_import_ceda_csv(args):
     canonical["source_tier"]=CURATED_OFFICIAL_DERIVED
     canonical["data_mode"]="REAL"
     norm=normalize_prices(canonical); daily=aggregate_market_daily(norm)
-    out=settings.processed_dir/"market_daily.csv"; daily.to_csv(out,index=False)
-    market_path=_update_market_index(daily)
+    panel,out=_write_processed_panel(daily)
+    market_path=_update_market_index(panel)
     raw=settings.raw_dir/f"ceda_portal_{p.name}"
     shutil.copy2(p,raw)
     _record_ingest_provenance(
@@ -176,8 +204,8 @@ def cmd_import_data_gov_csv(args):
     canonical["source_tier"]=PRIMARY_OFFICIAL
     canonical["data_mode"]="REAL"
     norm=normalize_prices(canonical); daily=aggregate_market_daily(norm)
-    out=settings.processed_dir/"market_daily.csv"; daily.to_csv(out,index=False)
-    market_path=_update_market_index(daily)
+    panel,out=_write_processed_panel(daily)
+    market_path=_update_market_index(panel)
     raw=settings.raw_dir/f"data_gov_manual_{p.name}"
     shutil.copy2(p,raw)
     _record_ingest_provenance(
@@ -516,7 +544,7 @@ def cmd_doctor(args):
         report["data_mode"]=repo.data_mode()
         tiers=sorted(split_tiers(prices.get("source_tier",pd.Series(dtype=str)).fillna("").astype(str)))
         report["source_tiers"]=tiers
-        report["observations"]=int(len(prices))
+        report["observations"]=len(prices)
         report["states"]=int(prices.state.nunique())
         report["markets"]=int(prices.market_id.nunique())
         report["commodities"]=int(prices.commodity.nunique())
@@ -537,7 +565,7 @@ def cmd_doctor(args):
     weather_path=settings.processed_dir/"weather_daily.csv"
     if weather_path.exists():
         w=pd.read_csv(weather_path)
-        report["weather_rows"]=int(len(w))
+        report["weather_rows"]=len(w)
         report["weather_markets"]=int(w.get("market_id",pd.Series(dtype=str)).nunique())
     freeze_root=settings.output_dir/"freezes"
     dirs=sorted([p for p in freeze_root.glob("*") if p.is_dir()],reverse=True) if freeze_root.exists() else []

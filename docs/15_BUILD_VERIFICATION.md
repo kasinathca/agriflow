@@ -1,5 +1,23 @@
 # Build Verification Record — v1.4.0
 
+## v1.4.2 stabilization verification — 2026-10-13
+
+- Python: **3.12.8** in the repository-local `.venv`.
+- Compilation: **PASS** for `src`, `tests` and `scripts`.
+- Automated tests: **48/48 PASS**.
+- Structural validator: **PASS**.
+- Cached and freshly acquired GeoJSON: **PASS**; detected property `shapeName`.
+- Choropleth: **8/8 DEMO data states matched**, including macron-normalized names.
+- Live Chrome interaction: all eight dashboard tabs, commodity/state/market/date controls,
+  choropleth click drill-down, ripple leader/lag controls, table content and responsive layout
+  exercised with no browser-console errors or server tracebacks.
+- `start_agriflow.bat`: first setup/start and quick restart **PASS**; existing `.env` preserved.
+- REAL empirical readiness: **BLOCKED as designed** because no authoritative credential/export
+  is available; a DEMO-only test freeze was created, hash-verified and analyzed strictly for
+  software verification.
+
+---
+
 Verification date: 2026-10-07
 
 ## Development-tree verification

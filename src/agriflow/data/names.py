@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import unicodedata
+
 STATE_ALIASES = {
     "nct of delhi": "Delhi",
     "delhi (nct)": "Delhi",
@@ -24,5 +26,13 @@ def canonical_state(value: object) -> str:
     s = str(value or "").strip()
     if not s:
         return s
-    key = " ".join(s.lower().split())
-    return STATE_ALIASES.get(key, s)
+    # Boundary providers sometimes transliterate Indian state names with macrons
+    # (for example ``Mahārāshtra``).  Strip combining marks before applying the
+    # provider-independent aliases so both boundary and mandi names converge.
+    ascii_name = "".join(
+        char
+        for char in unicodedata.normalize("NFKD", s)
+        if not unicodedata.combining(char)
+    )
+    key = " ".join(ascii_name.lower().split())
+    return STATE_ALIASES.get(key, ascii_name.title())

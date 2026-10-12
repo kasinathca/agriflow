@@ -1,3 +1,25 @@
+# AgriFlow v1.4.2 — Dashboard and Runtime Stabilization
+
+Release date: 2026-10-13
+
+## Fixed
+- Made India ADM1 property detection provider-independent and validated boundary-to-data matches before constructing a choropleth.
+- Canonicalized both GeoJSON and mandi state names, including provider transliterations such as `Mahārāshtra`, so all matching states render and remain clickable.
+- Replaced the silent empty-map failure with a coordinate fallback or an explicit unavailable-state message.
+- Changed real-data imports and CEDA rebuilds to merge compatible market-day panels instead of blindly overwriting prior authoritative data.
+- Prevented repeated identical market-day arrival totals from being summed across variety rows and blocked aggregation across mixed arrival units.
+
+## Runtime and verification
+- Added `start_agriflow.bat` as the one-click Windows setup/launch path.
+- Added focused choropleth, canonicalization, fallback, arrival and panel-merge regression tests.
+- DEMO/REAL provenance gates, non-causal interpretation language and empirical freeze protections remain unchanged.
+
+## Remaining empirical dependency
+- No CEDA or data.gov.in credential is present locally. The official OGD manual download also requires user details and CAPTCHA, so no REAL dataset or final empirical freeze is claimed in this release.
+- The course-project PDF referenced by the completion brief was not supplied in the workspace or attachment set; PDF-specific evidence mapping remains pending that file.
+
+---
+
 # AgriFlow v1.4.0 — Provenance-Gated Real-Data Bootstrap
 
 Release date: 2026-10-07

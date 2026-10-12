@@ -2,16 +2,16 @@ from __future__ import annotations
 
 """Resumable historical ingestion for the CEDA AGMARKNET API."""
 
-from dataclasses import dataclass, asdict
-from datetime import datetime, timezone
-from pathlib import Path
 import json
 import re
-from typing import Iterable
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
+from pathlib import Path
 
 import pandas as pd
 
-from agriflow.data.processing import normalize_prices, aggregate_market_daily
+from agriflow.data.processing import aggregate_market_daily, merge_market_daily, normalize_prices
 from agriflow.data.sources.ceda import CedaHistoricalSource, year_windows
 
 
@@ -174,13 +174,13 @@ class CedaHistoricalIngestor:
                 metadata = {
                     "job": asdict(job),
                     "completed_at_utc": datetime.now(timezone.utc).isoformat(),
-                    "row_count": int(len(frame)),
+                    "row_count": len(frame),
                     "include_quantities": include_quantities,
                     "source": "CEDA_AGMARKNET",
                 }
                 meta_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
                 counters["fetched"] += 1
-                counters["rows"] += int(len(frame))
+                counters["rows"] += len(frame)
             except Exception as exc:  # retained in an explicit error ledger
                 counters["failed"] += 1
                 errors.append({"job": asdict(job), "error": f"{type(exc).__name__}: {exc}"})
@@ -215,5 +215,7 @@ class CedaHistoricalIngestor:
         normalized = normalize_prices(raw)
         daily = aggregate_market_daily(normalized)
         out = self.processed_dir / "market_daily.csv"
-        daily.to_csv(out, index=False)
-        return daily, out
+        existing = pd.read_csv(out) if out.exists() else pd.DataFrame()
+        combined = merge_market_daily(existing, daily)
+        combined.to_csv(out, index=False)
+        return combined, out

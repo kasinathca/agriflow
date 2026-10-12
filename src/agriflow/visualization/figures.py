@@ -2,15 +2,95 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from agriflow.visualization.theme import NAVY, GREEN, TEAL, GOLD, RED, MUTED, WHITE, GRID, PLOTLY_LAYOUT
-from agriflow.data.names import canonical_state
-from agriflow.data.identity import ensure_market_id
 from agriflow.analytics.events import ripple_snapshot
+from agriflow.data.identity import ensure_market_id
+from agriflow.data.names import canonical_state
+from agriflow.visualization.theme import (
+    GOLD,
+    GREEN,
+    GRID,
+    MUTED,
+    NAVY,
+    PLOTLY_LAYOUT,
+    TEAL,
+    WHITE,
+)
+
+GEO_STATE_PROPERTY_CANDIDATES = (
+    "STNAME", "st_nm", "state", "STATE", "NAME_1", "shapeName", "name"
+)
+
+
+def detect_geo_state_property(geojson: dict, data_states: set[str] | None = None) -> str:
+    """Return the most plausible ADM1 name property in a GeoJSON collection."""
+    features = geojson.get("features") if isinstance(geojson, dict) else None
+    if not isinstance(features, list) or not features:
+        raise ValueError("GeoJSON has no features")
+    properties = [
+        feature.get("properties", {})
+        for feature in features
+        if isinstance(feature, dict) and isinstance(feature.get("properties"), dict)
+    ]
+    if not properties:
+        raise ValueError("GeoJSON features have no properties")
+
+    actual_keys = {str(key).lower(): str(key) for props in properties for key in props}
+    candidates = [
+        actual_keys[name.lower()]
+        for name in GEO_STATE_PROPERTY_CANDIDATES
+        if name.lower() in actual_keys
+    ]
+    if not candidates:
+        raise ValueError("GeoJSON has no supported state-name property")
+
+    wanted = {canonical_state(value) for value in (data_states or set()) if canonical_state(value)}
+
+    def score(key: str) -> tuple[int, int, int]:
+        values = [canonical_state(props.get(key)) for props in properties]
+        nonempty = {value for value in values if value}
+        matches = len(nonempty & wanted) if wanted else 0
+        priority = -next(
+            i for i, name in enumerate(GEO_STATE_PROPERTY_CANDIDATES)
+            if name.lower() == key.lower()
+        )
+        return matches, len(nonempty), priority
+
+    selected = max(candidates, key=score)
+    if wanted and score(selected)[0] == 0:
+        raise ValueError("GeoJSON state names do not match the selected mandi data")
+    return selected
+
+
+def prepare_state_geojson(geojson: dict, data_states: set[str]) -> tuple[dict, str]:
+    """Validate a state GeoJSON and add canonical IDs used by Plotly."""
+    state_property = detect_geo_state_property(geojson, data_states)
+    prepared = json.loads(json.dumps(geojson))
+    usable = 0
+    matched = 0
+    wanted = {canonical_state(value) for value in data_states if canonical_state(value)}
+    for feature in prepared.get("features", []):
+        if not isinstance(feature, dict) or not isinstance(feature.get("properties"), dict):
+            continue
+        geometry = feature.get("geometry")
+        if not isinstance(geometry, dict) or geometry.get("type") not in {"Polygon", "MultiPolygon"}:
+            continue
+        name = canonical_state(feature["properties"].get(state_property))
+        if not name:
+            continue
+        feature["properties"]["AGRIFLOW_STATE"] = name
+        usable += 1
+        matched += int(name in wanted)
+    if not usable:
+        raise ValueError("GeoJSON has no usable Polygon or MultiPolygon state features")
+    if not matched:
+        raise ValueError("GeoJSON contains no state polygons matching the selected mandi data")
+    return prepared, state_property
 
 
 def _finish(fig: go.Figure, title: str | None = None) -> go.Figure:
@@ -72,23 +152,29 @@ def coverage_heatmap(audit: pd.DataFrame, commodity: str | None = None) -> go.Fi
 def state_map(df: pd.DataFrame, markets: pd.DataFrame, commodity: str, geojson_path: Path | None = None) -> go.Figure:
     x=df[df.commodity.eq(commodity)].copy()
     if x.empty: return empty_figure("No state values for this commodity.")
+    x["state"] = x["state"].map(canonical_state)
     market_col="market_id" if "market_id" in x.columns else "market"
     state=x.groupby("state",as_index=False).agg(modal_price=("modal_price","median"), markets=(market_col,"nunique"), observations=("modal_price","size"))
     if geojson_path and geojson_path.exists():
         try:
             geo=json.loads(geojson_path.read_text(encoding="utf-8"))
-            for feature in geo.get("features", []):
-                props = feature.setdefault("properties", {})
-                props["AGRIFLOW_STATE"] = canonical_state(props.get("STNAME") or props.get("shapeName") or props.get("NAME_1") or "")
+            geo, _ = prepare_state_geojson(geo, set(state["state"]))
             fig=px.choropleth(state, geojson=geo, locations="state", featureidkey="properties.AGRIFLOW_STATE", color="modal_price",
                               color_continuous_scale="YlGnBu", hover_data={"markets":True,"observations":True,"modal_price":":,.0f"})
-            fig.update_geos(fitbounds="locations", visible=False)
+            fig.update_geos(fitbounds="locations", visible=False, center=dict(lat=22.5, lon=79))
             fig.update_layout(coloraxis_colorbar_title="₹/q")
             return _finish(fig, f"Median {commodity} price by state — click a state to drill down")
-        except Exception:
+        except (OSError, UnicodeError, json.JSONDecodeError, TypeError, ValueError):
             pass
-    coords=markets.groupby("state",as_index=False).agg(lat=("lat","mean"),lon=("lon","mean"))
+    required = {"state", "lat", "lon"}
+    if markets.empty or not required.issubset(markets.columns):
+        return empty_figure("State boundary map is unavailable and no fallback coordinates exist.")
+    market_coords = markets.copy()
+    market_coords["state"] = market_coords["state"].map(canonical_state)
+    coords=market_coords.groupby("state",as_index=False).agg(lat=("lat","mean"),lon=("lon","mean"))
     state=state.merge(coords,on="state",how="left").dropna(subset=["lat","lon"])
+    if state.empty:
+        return empty_figure("State boundary map is unavailable and no matching fallback coordinates exist.")
     fig=px.scatter_geo(state,lat="lat",lon="lon",size="markets",color="modal_price",hover_name="state",
                        hover_data={"markets":True,"observations":True,"modal_price":":,.0f","lat":False,"lon":False},
                        color_continuous_scale="YlGnBu",scope="asia")

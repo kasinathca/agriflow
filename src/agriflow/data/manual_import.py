@@ -3,6 +3,7 @@ from __future__ import annotations
 """Schema-tolerant import helpers for manually downloaded mandi CSV exports."""
 
 import re
+
 import pandas as pd
 
 
@@ -48,7 +49,8 @@ def canonicalize_mandi_export(
         "min_price": [lambda x: ("min" in x or "minimum" in x) and "price" in x],
         "max_price": [lambda x: ("max" in x or "maximum" in x) and "price" in x],
         "modal_price": [lambda x: ("modal" in x or "mode" in x) and "price" in x],
-        "arrivals": [lambda x: any(t in x for t in ("arrival", "quantity", "qty")) and not ("date" in x)],
+        "arrivals": [lambda x: any(t in x for t in ("arrival", "quantity", "qty")) and "date" not in x and "unit" not in x],
+        "arrival_unit": [lambda x: "unit" in x and any(t in x for t in ("arrival", "quantity", "qty"))],
     }
     for target, predicates in candidates.items():
         source = _find_column(cols, predicates)
@@ -75,4 +77,6 @@ def canonicalize_mandi_export(
     for col in ["variety", "grade", "min_price", "max_price", "arrivals"]:
         if col not in out.columns:
             out[col] = pd.NA if col in {"min_price", "max_price", "arrivals"} else ""
+    if "arrival_unit" not in out.columns:
+        out["arrival_unit"] = "UNKNOWN"
     return out
