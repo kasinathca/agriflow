@@ -6,7 +6,7 @@
 
 Academic Data Science project by **Kasinath C A (24MID0124)** and **Kamal Nayan C S (24MID0189)**.
 
-AgriFlow is a local-first analytical system for studying agricultural wholesale price dispersion, arrivals, geographic market integration, statistically inferred price leadership, weather-linked shocks and market crunches across India. It is intentionally not a generic next-day price-prediction dashboard.
+AgriFlow is a local-first analytical system for studying agricultural wholesale price dispersion, arrivals, geographic market integration, statistically inferred price leadership, weather-linked shocks and market crunches across India. The course-project extension also provides a deliberately small next-reported-observation Onion price forecast. It does not claim an exact next-day forecast or a current quotation.
 
 > **Academic-integrity rule:** the zero-credential demonstration uses deterministic synthetic data and is permanently labelled `DEMO`. Demo numbers are software-verification fixtures, not empirical findings. Final report results must be regenerated in `REAL` mode from frozen public-source data.
 
@@ -43,20 +43,23 @@ Open **http://127.0.0.1:8050** after launching.
 - **Price-shock Ripple** — leader daily shock plus follower daily responses at their own inferred edge lags.
 - **Weather & Crunch** — price/rain/temperature timelines, declustered weather-event response chart and simultaneous low-arrival/high-price crunch candidates.
 - **Geography** — distance versus daily-return co-movement, plus QAP-style market-label permutation significance.
+- **Forecasting** — saved next-report forecasts, held-out predictions and a six-model comparison. Training occurs offline, never inside a Dash callback.
 - **Data Quality** — reporting density, missing arrivals and coverage-driven commodity selection.
 - **Research Status** — latest frozen empirical scope, readiness gates and academic-integrity status.
 - **Methods & Sources** — provenance and interpretation guardrails.
 
 ## 3. Core data sources
 
-### Government of India OGD / AGMARKNET — current mandi prices
+### Government of India OGD / AGMARKNET — deprecated optional current-price acquisition
 Resource:
 `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070`
 
 Catalog page:
 `https://data.gov.in/resource/current-daily-price-various-commodities-various-markets-mandi`
 
-Optional `.env` key:
+The direct API command remains only for backward compatibility. Normal startup, analysis,
+forecast training, prediction, testing and presentation generation do not require this key or
+network access. Optional legacy `.env` key:
 ```env
 DATA_GOV_API_KEY=your_key_here
 ```
@@ -65,6 +68,31 @@ Example:
 ```bash
 python -m agriflow fetch-current --state Maharashtra --commodity Onion --max-records 5000
 ```
+
+## 3A. Offline forecasting extension
+
+The forecasting target is `modal_price` in INR per quintal at the next reported observation for
+each market. Lags count prior reports, not calendar days. The experiment uses a common historical
+cohort, global chronological date boundaries (approximately 70/15/15), validation MAE for model
+selection and a held-out test set for final comparison.
+
+```powershell
+# Train two baselines and four scikit-learn models; write measured evidence.
+.\.venv\Scripts\python.exe -m agriflow train-forecast
+
+# Show all saved next-report forecasts or select one eligible market.
+.\.venv\Scripts\python.exe -m agriflow predict
+.\.venv\Scripts\python.exe -m agriflow predict --market-id maharashtra__ahmadnagar__akole
+
+# Regenerate the final 15-slide PowerPoint from saved evidence.
+& 'C:\Users\kasin\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe' scripts\generate_final_presentation.mjs
+```
+
+Artifacts are written to `deliverables/final_review/forecasting/`. The experiment compares
+persistence, lag-7, Ridge, Decision Tree, Random Forest and Histogram Gradient Boosting. The ten
+reported metrics are MAE, MSE, RMSE, R-squared, MAPE, sMAPE, WAPE, median absolute error, mean bias
+error and directional accuracy. See `forecasting_methodology.md` in that directory for the exact
+features, split boundaries, measured results and limitations.
 
 ### CEDA Agri Market Data — historical AGMARKNET prices and arrivals
 Documentation:

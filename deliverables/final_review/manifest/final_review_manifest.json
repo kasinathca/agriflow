@@ -26,7 +26,12 @@
     "influence_onion.csv",
     "integration_onion.csv",
     "lead_lag_onion.csv",
-    "market_crunch_candidates.csv"
+    "market_crunch_candidates.csv",
+    "forecasting/model_comparison.csv",
+    "forecasting/test_predictions.csv",
+    "forecasting/latest_forecasts.csv",
+    "forecasting/selected_model.json",
+    "forecasting/forecast_model.joblib"
   ],
   "figure_files": [
     "real_onion_arrivals_price.html",
@@ -36,5 +41,24 @@
   "screenshot_files": [
     "real_overview.png"
   ],
-  "academic_integrity": "REAL CEDA/AGMARKNET evidence only. State breadth, coordinates, weather, full-state ingestion and final freeze remain incomplete."
+  "forecasting": {
+    "target": "modal_price",
+    "unit": "INR per quintal",
+    "horizon": "next reported market observation",
+    "candidate_count": 6,
+    "metric_count": 10,
+    "selected_model": "M0 Persistence",
+    "selection_rule": "lowest validation MAE; validation RMSE tie-break",
+    "validation_mae": 128.1772151898734,
+    "held_out_test_mae": 101.39794967381174,
+    "held_out_test_rmse": 180.9732413167576,
+    "test_rows": 1073,
+    "improvement_vs_persistence_pct": 0.0
+  },
+  "presentation_files": [
+    "AgriFlow_Final_Review.pptx",
+    "AgriFlow_Final_Review.pdf"
+  ],
+  "verification_report": "verification_report.md",
+  "academic_integrity": "REAL CEDA/AGMARKNET evidence only. The forecasting experiment is Maharashtra Onion only and predicts the next reported observation, not an exact next-day or live price. The validation-selected persistence baseline did not demonstrate an ML accuracy advantage. State breadth, coordinates, weather, full-state ingestion and final freeze remain incomplete."
 }

@@ -1,0 +1,24 @@
+market_id,market,district,state,last_observed_date,last_observed_price,predicted_next_report_price,model,forecast_horizon,historical_data_through
+maharashtra__ahmadnagar__ahmednagar,Ahmednagar,Ahmadnagar,Maharashtra,2025-10-27,1150.0,1150.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__akole,Akole,Ahmadnagar,Maharashtra,2025-10-30,1351.0,1351.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__jamkhed,Jamkhed,Ahmadnagar,Maharashtra,2025-10-30,950.0,950.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__karjat,Karjat,Ahmadnagar,Maharashtra,2025-10-29,800.0,800.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__kopargaon,Kopargaon,Ahmadnagar,Maharashtra,2025-10-30,1250.0,1250.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__newasa_ghodegaon,Newasa(Ghodegaon),Ahmadnagar,Maharashtra,2025-10-29,1200.0,1200.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__om_chaitanya_multistate_agro_purpose_coop_society,Om Chaitanya Multistate Agro Purpose CoOp Society,Ahmadnagar,Maharashtra,2025-10-28,1150.0,1150.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__parner,Parner,Ahmadnagar,Maharashtra,2025-10-29,1400.0,1400.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__pathardi,Pathardi,Ahmadnagar,Maharashtra,2025-10-29,1150.0,1150.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__rahata,Rahata,Ahmadnagar,Maharashtra,2025-10-28,1300.0,1300.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__rahuri,Rahuri,Ahmadnagar,Maharashtra,2025-10-28,1100.0,1100.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__rahuri_vambori,Rahuri(Vambori),Ahmadnagar,Maharashtra,2025-10-30,1300.0,1300.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__sangamner,Sangamner,Ahmadnagar,Maharashtra,2025-10-30,1100.0,1100.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__shevgaon,Shevgaon,Ahmadnagar,Maharashtra,2025-10-30,950.0,950.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__shree_sairaj_krushi_market,Shree Sairaj Krushi Market,Ahmadnagar,Maharashtra,2025-10-15,900.0,900.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__shrigonda,Shrigonda,Ahmadnagar,Maharashtra,2025-06-15,1000.0,1000.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__ahmadnagar__shrirampur,Shrirampur,Ahmadnagar,Maharashtra,2025-10-29,1450.0,1450.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__akola__akola,Akola,Akola,Maharashtra,2025-10-30,1200.0,1200.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__amravati__amrawati_frui_veg_market,Amrawati(Frui & Veg. Market),Amravati,Maharashtra,2025-10-29,1300.0,1300.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__aurangabad__chattrapati_sambhajinagar,Chattrapati Sambhajinagar,Aurangabad,Maharashtra,2023-11-30,2350.0,2350.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__aurangabad__gangapur,Gangapur,Aurangabad,Maharashtra,2023-11-30,3401.0,3401.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__aurangabad__lasur_station,Lasur Station,Aurangabad,Maharashtra,2023-11-28,3700.0,3700.0,M0 Persistence,next reported market observation,2025-10-30
+maharashtra__aurangabad__vaijpur,Vaijpur,Aurangabad,Maharashtra,2023-11-30,3000.0,3000.0,M0 Persistence,next reported market observation,2025-10-30

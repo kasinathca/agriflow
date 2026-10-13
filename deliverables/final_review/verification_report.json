@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "presentation": "deliverables\\final_review\\AgriFlow_Final_Review.pptx",
+  "slide_count": 15,
+  "native_chart_count": 6,
+  "embedded_media_count": 1,
+  "required_headings_present": true,
+  "ten_metric_labels_present": true,
+  "team_identity_present": true,
+  "saved_claims_match": true,
+  "findings": []
+}

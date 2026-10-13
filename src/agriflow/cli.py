@@ -45,6 +45,7 @@ from agriflow.data.sources.data_gov import DataGovMandiSource
 from agriflow.data.sources.geo import GeographySource
 from agriflow.data.sources.nasa_power import NasaPowerSource
 from agriflow.data.weather_ingest import PowerHistoricalIngestor
+from agriflow.forecasting.pipeline import load_forecast_artifacts, run_training
 from agriflow.research.freeze import (
     ReadinessPolicy,
     empirical_readiness,
@@ -124,6 +125,7 @@ def cmd_init(args):
 
 def cmd_fetch_current(args):
     _ensure_dirs()
+    print("DEPRECATED: direct data.gov.in fetching is optional and is not used by the forecasting or presentation workflows.", file=sys.stderr)
     if not settings.data_gov_api_key:
         raise SystemExit("DATA_GOV_API_KEY is missing. Add it to .env; demo mode requires no key.")
     src=DataGovMandiSource(settings.data_gov_api_key)
@@ -637,11 +639,32 @@ def cmd_run(args):
     run()
 
 
+def cmd_train_forecast(args):
+    metadata = run_training()
+    print(json.dumps({
+        "selected_model": metadata["selected_model"],
+        "validation_mae": metadata["selected_validation_mae"],
+        "test_mae": metadata["selected_test_mae"],
+        "test_rmse": metadata["selected_test_rmse"],
+        "improvement_vs_persistence_pct": metadata["mae_improvement_vs_persistence_pct"],
+        "output_dir": "deliverables/final_review/forecasting",
+    }, indent=2))
+
+
+def cmd_predict(args):
+    _, _, forecasts = load_forecast_artifacts()
+    if args.market_id:
+        forecasts = forecasts[forecasts.market_id.eq(args.market_id)]
+    if forecasts.empty:
+        raise SystemExit("No saved forecast matches that market. Run train-forecast and use an eligible market_id.")
+    print(forecasts.to_string(index=False))
+
+
 def build_parser():
     p=argparse.ArgumentParser(prog="agriflow",description="AgriFlow data-science pipeline and dashboard")
     sub=p.add_subparsers(dest="command",required=True)
     s=sub.add_parser("init",help="Generate deterministic demo data and optionally cache state GeoJSON");s.add_argument("--no-geojson",dest="geojson",action="store_false");s.set_defaults(func=cmd_init,geojson=True)
-    s=sub.add_parser("fetch-current",help="Fetch current AGMARKNET observations from data.gov.in");s.add_argument("--state");s.add_argument("--commodity");s.add_argument("--max-records",type=int,default=5000);s.set_defaults(func=cmd_fetch_current)
+    s=sub.add_parser("fetch-current",help="Deprecated optional data.gov.in fetch; not required for normal operation");s.add_argument("--state");s.add_argument("--commodity");s.add_argument("--max-records",type=int,default=5000);s.set_defaults(func=cmd_fetch_current)
     s=sub.add_parser("import-prices",help="Import a generic mandi CSV with explicit provenance");s.add_argument("path");s.add_argument("--source",default="USER_IMPORT");s.add_argument("--source-tier",choices=[USER_SUPPLIED,SECONDARY_MIRROR],default=USER_SUPPLIED,help="Generic imports can only be USER_SUPPLIED or SECONDARY_MIRROR; both are blocked from final-paper freezes");s.set_defaults(func=cmd_import)
     s=sub.add_parser("import-ceda-csv",help="Import a manually downloaded CEDA Agri-Market portal CSV as curated official-derived data");s.add_argument("path");s.add_argument("--state");s.add_argument("--district");s.add_argument("--market");s.add_argument("--commodity");s.set_defaults(func=cmd_import_ceda_csv)
     s=sub.add_parser("import-data-gov-csv",help="Import a manually downloaded official data.gov.in AGMARKNET CSV");s.add_argument("path");s.add_argument("--state");s.add_argument("--district");s.add_argument("--market");s.add_argument("--commodity");s.set_defaults(func=cmd_import_data_gov_csv)
@@ -686,6 +709,8 @@ def build_parser():
     s=sub.add_parser("analyze-freeze",help="Run paper-oriented analyses and temporal robustness checks on a frozen snapshot");s.add_argument("path");s.set_defaults(func=cmd_analyze_freeze)
     s=sub.add_parser("doctor",help="Report local credentials, source tiers, data coverage and empirical prerequisites without network calls");s.set_defaults(func=cmd_doctor)
     s=sub.add_parser("analyze",help="Generate reproducible exploratory analytical CSV outputs");s.set_defaults(func=cmd_analyze)
+    s=sub.add_parser("train-forecast",help="Train and evaluate all six offline next-report forecasting models");s.set_defaults(func=cmd_train_forecast)
+    s=sub.add_parser("predict",help="Display saved next-reported-observation forecasts");s.add_argument("--market-id");s.set_defaults(func=cmd_predict)
     s=sub.add_parser("run",help="Launch local dashboard");s.set_defaults(func=cmd_run)
     return p
 

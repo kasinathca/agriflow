@@ -1,27 +1,37 @@
 from __future__ import annotations
 
-from pathlib import Path
 import json
-import pandas as pd
-from dash import Dash, Input, Output, State, dcc, html, dash_table, no_update
 
-from agriflow.config import settings
-from agriflow.data.repository import DataRepository
-from agriflow.data.names import canonical_state
-from agriflow.data.processing import quality_summary
+import pandas as pd
+import plotly.graph_objects as go
+from dash import Dash, Input, Output, State, dash_table, dcc, html, no_update
+
 from agriflow.analytics.coverage import coverage_audit
-from agriflow.analytics.selection import commodity_scope_table, SelectionPolicy
+from agriflow.analytics.events import detect_market_crunches, detect_price_shocks
+from agriflow.analytics.geography import distance_effect_summary, distance_similarity
+from agriflow.analytics.integration import market_integration_pairs
 from agriflow.analytics.lead_lag import infer_lead_lag_edges
 from agriflow.analytics.network import influence_scores
-from agriflow.analytics.geography import distance_similarity, distance_effect_summary
-from agriflow.analytics.integration import market_integration_pairs
-from agriflow.analytics.weather import join_market_weather, event_study, event_study_summary
-from agriflow.analytics.events import detect_market_crunches, detect_price_shocks
+from agriflow.analytics.selection import SelectionPolicy, commodity_scope_table
 from agriflow.analytics.supply_price import supply_price_stats
+from agriflow.analytics.weather import event_study, event_study_summary, join_market_weather
+from agriflow.config import settings
+from agriflow.data.names import canonical_state
+from agriflow.data.processing import quality_summary
+from agriflow.data.repository import DataRepository
 from agriflow.research.freeze import ReadinessPolicy, empirical_readiness
 from agriflow.visualization.figures import (
-    price_trend, arrivals_price_scatter, coverage_heatmap, state_map, network_figure,
-    influence_bar, distance_scatter, weather_price_figure, weather_event_response_figure, crunch_table_figure, ripple_figure,
+    arrivals_price_scatter,
+    coverage_heatmap,
+    crunch_table_figure,
+    distance_scatter,
+    influence_bar,
+    network_figure,
+    price_trend,
+    ripple_figure,
+    state_map,
+    weather_event_response_figure,
+    weather_price_figure,
 )
 
 repo = DataRepository()
@@ -32,6 +42,7 @@ MODE = repo.data_mode()
 AUDIT = coverage_audit(PRICES)
 SCOPE = commodity_scope_table(PRICES, SelectionPolicy())
 GEOJSON = settings.cache_dir / "india_states.geojson"
+FORECAST_DIR = settings.root / "deliverables" / "final_review" / "forecasting"
 
 
 def _options(values):
@@ -59,6 +70,21 @@ def _filter(commodity: str, state: str, start_date, end_date) -> pd.DataFrame:
 def _national_map_frame(commodity: str, start_date, end_date) -> pd.DataFrame:
     """Keep the India map national while other panels follow the state selector."""
     return _filter(commodity, "All India", start_date, end_date)
+
+
+def _load_forecast_view():
+    metadata_path = FORECAST_DIR / "selected_model.json"
+    forecasts_path = FORECAST_DIR / "latest_forecasts.csv"
+    predictions_path = FORECAST_DIR / "test_predictions.csv"
+    comparison_path = FORECAST_DIR / "model_comparison.csv"
+    if not all(path.exists() for path in [metadata_path, forecasts_path, predictions_path, comparison_path]):
+        return None
+    return (
+        json.loads(metadata_path.read_text(encoding="utf-8")),
+        pd.read_csv(forecasts_path),
+        pd.read_csv(predictions_path, parse_dates=["date"]),
+        pd.read_csv(comparison_path),
+    )
 
 
 def _map_click_state(click, available_states=None):
@@ -102,6 +128,7 @@ def create_app() -> Dash:
             dcc.Tab(label="Market Influence", value="influence"),
             dcc.Tab(label="Weather & Crunch", value="weather"),
             dcc.Tab(label="Geography", value="geography"),
+            dcc.Tab(label="Forecasting", value="forecasting"),
             dcc.Tab(label="Data Quality", value="quality"),
             dcc.Tab(label="Research Status", value="research"),
             dcc.Tab(label="Methods & Sources", value="methods"),
@@ -188,6 +215,55 @@ def create_app() -> Dash:
             text="Insufficient market pairs." if summary["spearman_rho"] is None else f"Across {summary['pairs']} market pairs, Spearman ρ(distance, return correlation) = {summary['spearman_rho']:.3f}. QAP-style label-permutation p={summary['qap_p_value']:.3g} (conventional pairwise p={summary['p_value']:.3g}, shown only as a secondary diagnostic)."
             table = dash_table.DataTable(data=integ.head(15).round(3).to_dict("records"),columns=[{"name":c.replace("_"," ").title(),"id":c} for c in integ.columns],page_size=10,style_table={"overflowX":"auto"},style_header={"fontWeight":"700","backgroundColor":"#E9EEE9"}) if not integ.empty else html.P("Insufficient data for pairwise integration scores.")
             return html.Div([html.Div("Distance is great-circle distance, not road distance or transport cost. Because market-pair observations are not independent, the dashboard reports a QAP-style label-permutation significance check for distance decay. The integration score remains an exploratory composite and must be read with its component metrics.",className="academic-note"),html.Div(dcc.Graph(figure=distance_scatter(pairs)),className="card"),html.Div(className="grid-2",children=[html.Div([html.H3("Distance-effect statistic"),html.P(text)],className="card"),html.Div([html.H3("Most integrated market pairs"),table],className="card")])])
+        if tab == "forecasting":
+            artifacts = _load_forecast_view()
+            if artifacts is None:
+                return html.Div([
+                    html.Div("Forecast artifacts are not available yet.", className="academic-note"),
+                    html.Div([html.H3("Generate the offline experiment"), html.P("Run: python -m agriflow train-forecast")], className="card"),
+                ])
+            metadata, forecasts, predictions, comparison = artifacts
+            selected = metadata["selected_model"]
+            selected_predictions = predictions[predictions.model.eq(selected)].copy()
+            selected_forecast = forecasts[forecasts.market_id.eq(market)]
+            if selected_forecast.empty:
+                selected_forecast = forecasts.head(1)
+            row = selected_forecast.iloc[0]
+            market_predictions = selected_predictions[selected_predictions.market_id.eq(row.market_id)].sort_values("date")
+            figure = go.Figure([
+                go.Scatter(x=market_predictions.date, y=market_predictions.modal_price, name="Actual", mode="lines+markers"),
+                go.Scatter(x=market_predictions.date, y=market_predictions.predicted_price, name="Predicted", mode="lines+markers"),
+            ])
+            figure.update_layout(
+                title=f"Held-out next-report predictions: {row.market}",
+                xaxis_title="Reported date", yaxis_title="INR per quintal", template="plotly_white",
+            )
+            selected_metrics = comparison[comparison.model.eq(selected)].iloc[0]
+            return html.Div([
+                html.Div(
+                    f"Historical next-reported-observation forecast. Data ends {row.historical_data_through}; this is not a current market quotation or an exact next-day forecast.",
+                    className="academic-note",
+                ),
+                html.Div(className="kpis", children=[
+                    _card("Selected model", selected),
+                    _card("Last reported price", f"₹{row.last_observed_price:,.0f}/q on {row.last_observed_date}"),
+                    _card("Next-report forecast", f"₹{row.predicted_next_report_price:,.0f}/q"),
+                    _card("Held-out MAE", f"₹{selected_metrics.mae:,.1f}/q"),
+                ]),
+                html.Div(className="grid-2", children=[
+                    html.Div(dcc.Graph(figure=figure), className="card"),
+                    html.Div([
+                        html.H3("Model comparison"),
+                        dash_table.DataTable(
+                            data=comparison[["model", "validation_mae", "mae", "rmse", "r2", "directional_accuracy_pct"]].round(3).to_dict("records"),
+                            columns=[{"name": c.replace("_", " ").title(), "id": c} for c in ["model", "validation_mae", "mae", "rmse", "r2", "directional_accuracy_pct"]],
+                            style_table={"overflowX": "auto"},
+                            style_header={"fontWeight": "700", "backgroundColor": "#E9EEE9"},
+                        ),
+                        html.P("Selection uses validation MAE, with validation RMSE as tie-break. Test results remain held out until selection.", className="section-note"),
+                    ], className="card"),
+                ]),
+            ])
         if tab == "research":
             current=empirical_readiness(
                 PRICES,MARKETS,WEATHER,[commodity],start,end,ReadinessPolicy()

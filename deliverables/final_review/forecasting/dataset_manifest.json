@@ -1,0 +1,26 @@
+{
+  "source": "CEDA_AGMARKNET",
+  "source_tier": "CURATED_OFFICIAL_DERIVED",
+  "data_mode": "REAL",
+  "commodity": "Onion",
+  "states": [
+    "Maharashtra"
+  ],
+  "districts": [
+    "Ahmadnagar",
+    "Akola",
+    "Amravati",
+    "Aurangabad"
+  ],
+  "market_count": 25,
+  "processed_rows": 7794,
+  "date_min": "2023-01-01",
+  "date_max": "2025-10-30",
+  "target": "modal_price",
+  "price_unit": "INR per quintal",
+  "missing_modal_price_rows": 0,
+  "file_sha256": "a4bea38608bdc5d525bc7d0e8d30d34f1f67a5132dc09004ba9c126837c0a82e",
+  "acquisition_context": "Local completed CEDA Agri Market Data checkpoints; offline training input",
+  "raw_checkpoint_files": 10,
+  "raw_rows": 8499
+}

@@ -1,0 +1,53 @@
+{
+  "MAE": {
+    "column": "mae",
+    "unit": "INR per quintal",
+    "direction": "lower"
+  },
+  "MSE": {
+    "column": "mse",
+    "unit": "squared INR per quintal",
+    "direction": "lower"
+  },
+  "RMSE": {
+    "column": "rmse",
+    "unit": "INR per quintal",
+    "direction": "lower"
+  },
+  "R2": {
+    "column": "r2",
+    "unit": "unitless",
+    "direction": "higher"
+  },
+  "MAPE": {
+    "column": "mape_pct",
+    "unit": "percent",
+    "direction": "lower"
+  },
+  "sMAPE": {
+    "column": "smape_pct",
+    "unit": "percent",
+    "direction": "lower"
+  },
+  "WAPE": {
+    "column": "wape_pct",
+    "unit": "percent",
+    "direction": "lower"
+  },
+  "Median absolute error": {
+    "column": "median_absolute_error",
+    "unit": "INR per quintal",
+    "direction": "lower"
+  },
+  "Mean bias error": {
+    "column": "mean_bias_error",
+    "unit": "INR per quintal",
+    "direction": "closer to zero"
+  },
+  "Directional accuracy": {
+    "column": "directional_accuracy_pct",
+    "unit": "percent",
+    "direction": "higher",
+    "unchanged_handling": "zero-to-zero counts as a match"
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "selected_model": "M0 Persistence",
+  "selection_rule": "lowest validation MAE; validation RMSE tie-break",
+  "random_seed": 42,
+  "scikit_learn_version": "1.9.1",
+  "target": "modal_price",
+  "price_unit": "INR per quintal",
+  "forecast_horizon": "next reported market observation",
+  "features": [
+    "lag_1",
+    "lag_2",
+    "lag_3",
+    "lag_7",
+    "lag_14",
+    "rolling_mean_3",
+    "rolling_mean_7",
+    "rolling_mean_14",
+    "rolling_std_7",
+    "previous_abs_change",
+    "previous_pct_change",
+    "market_id"
+  ],
+  "split": {
+    "train_end": "2025-01-13",
+    "validation_end": "2025-06-07",
+    "test_start": "2025-06-08",
+    "test_end": "2025-10-30",
+    "train_rows": 5199,
+    "validation_rows": 1106,
+    "test_rows": 1073
+  },
+  "cohort": {
+    "initial_rows": 7794,
+    "commodity_rows": 7794,
+    "invalid_rows_removed": 0,
+    "duplicate_rows_removed": 0,
+    "minimum_market_observations": 120,
+    "eligible_markets": [
+      "maharashtra__ahmadnagar__ahmednagar",
+      "maharashtra__ahmadnagar__akole",
+      "maharashtra__ahmadnagar__jamkhed",
+      "maharashtra__ahmadnagar__karjat",
+      "maharashtra__ahmadnagar__kopargaon",
+      "maharashtra__ahmadnagar__newasa_ghodegaon",
+      "maharashtra__ahmadnagar__om_chaitanya_multistate_agro_purpose_coop_society",
+      "maharashtra__ahmadnagar__parner",
+      "maharashtra__ahmadnagar__pathardi",
+      "maharashtra__ahmadnagar__rahata",
+      "maharashtra__ahmadnagar__rahuri",
+      "maharashtra__ahmadnagar__rahuri_vambori",
+      "maharashtra__ahmadnagar__sangamner",
+      "maharashtra__ahmadnagar__shevgaon",
+      "maharashtra__ahmadnagar__shree_sairaj_krushi_market",
+      "maharashtra__ahmadnagar__shrigonda",
+      "maharashtra__ahmadnagar__shrirampur",
+      "maharashtra__akola__akola",
+      "maharashtra__amravati__amrawati_frui_veg_market",
+      "maharashtra__aurangabad__chattrapati_sambhajinagar",
+      "maharashtra__aurangabad__gangapur",
+      "maharashtra__aurangabad__lasur_station",
+      "maharashtra__aurangabad__vaijpur"
+    ],
+    "excluded_markets": [
+      "maharashtra__aurangabad__bhagyoday_cotton_and_agri_market",
+      "maharashtra__aurangabad__paithan"
+    ],
+    "eligible_market_count": 23,
+    "rows_removed_insufficient_lag_history": 322,
+    "modeling_rows": 7378,
+    "feature_count": 12
+  },
+  "dataset": {
+    "source": "CEDA_AGMARKNET",
+    "source_tier": "CURATED_OFFICIAL_DERIVED",
+    "data_mode": "REAL",
+    "commodity": "Onion",
+    "states": [
+      "Maharashtra"
+    ],
+    "districts": [
+      "Ahmadnagar",
+      "Akola",
+      "Amravati",
+      "Aurangabad"
+    ],
+    "market_count": 25,
+    "processed_rows": 7794,
+    "date_min": "2023-01-01",
+    "date_max": "2025-10-30",
+    "target": "modal_price",
+    "price_unit": "INR per quintal",
+    "missing_modal_price_rows": 0,
+    "file_sha256": "a4bea38608bdc5d525bc7d0e8d30d34f1f67a5132dc09004ba9c126837c0a82e",
+    "acquisition_context": "Local completed CEDA Agri Market Data checkpoints; offline training input",
+    "raw_checkpoint_files": 10,
+    "raw_rows": 8499
+  },
+  "selected_validation_mae": 128.1772151898734,
+  "selected_test_mae": 101.39794967381174,
+  "selected_test_rmse": 180.9732413167576,
+  "persistence_test_mae": 101.39794967381174,
+  "mae_improvement_vs_persistence_pct": 0.0,
+  "model_specs": {
+    "M0 Persistence": {
+      "type": "baseline",
+      "parameters": "prediction = lag_1"
+    },
+    "M1 Lag-7": {
+      "type": "baseline",
+      "parameters": "prediction = lag_7"
+    },
+    "M2 Ridge": {
+      "type": "linear",
+      "parameters": "alpha=1.0; standardized numeric features"
+    },
+    "M3 Decision Tree": {
+      "type": "tree",
+      "parameters": "max_depth=8; min_samples_leaf=5; random_state=42"
+    },
+    "M4 Random Forest": {
+      "type": "ensemble",
+      "parameters": "n_estimators=200; max_depth=12; min_samples_leaf=3; random_state=42"
+    },
+    "M5 Hist Gradient Boosting": {
+      "type": "boosting",
+      "parameters": "max_iter=150; learning_rate=0.05; max_leaf_nodes=15; early_stopping=False; random_state=42"
+    }
+  }
+}
